@@ -3,10 +3,25 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { PhArrowRight, PhEye, PhEyeSlash, PhCheck } from '@phosphor-icons/vue';
 import { useAuthStore } from '../stores/auth';
+import { ApiError } from '../api';
+import { safeAuthRedirect } from '../auth-redirect';
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const registering = computed(() => route.path === '/register');
+const artwork = computed(() =>
+  registering.value
+    ? {
+        src: '/images/editorial/kikis-delivery-service.webp',
+        alt: "A scene from Kiki's Delivery Service",
+        position: '54% center'
+      }
+    : {
+        src: '/images/editorial/whisper-of-the-heart.webp',
+        alt: 'Shizuku with city rooftops behind her in Whisper of the Heart',
+        position: '68% center'
+      }
+);
 const name = ref('');
 const email = ref('');
 const password = ref('');
@@ -31,16 +46,14 @@ async function submit() {
       password: password.value,
       ...(registering.value ? { name: name.value } : {})
     });
-    const destination = route.query.redirect;
-    await router.push(
-      typeof destination === 'string' &&
-        destination.startsWith('/dashboard') &&
-        !destination.startsWith('//')
-        ? destination
-        : '/dashboard'
-    );
+    await router.push(safeAuthRedirect(route.query.redirect));
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Unable to sign in.';
+    error.value =
+      cause instanceof ApiError && cause.status >= 500
+        ? 'AniTrack is temporarily unavailable. Please try again in a moment. Your details are still here.'
+        : cause instanceof Error
+          ? cause.message
+          : 'Unable to sign in.';
   }
 }
 </script>
@@ -49,7 +62,13 @@ async function submit() {
   <main class="auth-page container">
     <section class="auth-story">
       <div class="auth-story-image">
-        <img src="/images/vinlandsaga.jpg" alt="Vinland Saga poster" />
+        <img
+          :src="artwork.src"
+          :alt="artwork.alt"
+          :style="{ objectPosition: artwork.position }"
+          width="1440"
+          height="779"
+        />
       </div>
       <div class="auth-story-copy">
         <h1>Every story.<br />A place in yours.</h1>
@@ -130,7 +149,13 @@ async function submit() {
       <p class="auth-switch">
         {{ registering ? 'Already have an account?' : 'New to AniTrack?' }}
         <RouterLink
-          :to="registering ? '/login' : '/register'"
+          :to="{
+            path: registering ? '/login' : '/register',
+            query:
+              typeof route.query.redirect === 'string'
+                ? { redirect: safeAuthRedirect(route.query.redirect) }
+                : {}
+          }"
           @click="
             error = '';
             password = '';

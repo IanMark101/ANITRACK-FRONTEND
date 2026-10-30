@@ -6,3 +6,11 @@ dist/
 .integration.env
 coverage/
 *.log
+.quasar/
+quasar.config.*.temporary.compiled*
+.tools/
+src-capacitor/node_modules/
+src-capacitor/www/
+src-capacitor/ios/
+*.jks
+*.keystore

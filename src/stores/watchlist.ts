@@ -9,29 +9,64 @@ export const useWatchlistStore = defineStore('watchlist', {
     catalog: [] as Anime[],
     metadata: { genres: [], statuses: [], posters: [] } as Metadata,
     loading: false,
+    loaded: false,
+    loadPromise: null as Promise<void> | null,
     busy: false,
     loadError: '',
     actionError: ''
   }),
   actions: {
+    async importAnime(externalId: string) {
+      return this.mutate(async () => {
+        const result = await api<{ item: Entry; created: boolean }>('/watchlist/import', {
+          method: 'POST',
+          body: jsonBody({ externalId })
+        });
+        const index = this.items.findIndex((entry) => entry.id === result.item.id);
+        if (index === -1) this.items.unshift(result.item);
+        else this.items[index] = result.item;
+        if (result.created) this.spotlightId = result.item.id;
+        return result.item;
+      });
+    },
+    async progress(id: string, delta: 1 | -1) {
+      return this.mutate(async () => {
+        const { item } = await api<{ item: Entry }>(`/watchlist/${id}/progress`, {
+          method: 'POST',
+          body: jsonBody({ delta })
+        });
+        const index = this.items.findIndex((entry) => entry.id === id);
+        if (index !== -1) this.items[index] = item;
+        return item;
+      });
+    },
     async load() {
+      if (this.loadPromise) return this.loadPromise;
       this.loading = true;
       this.loadError = '';
-      try {
-        const [collection, metadata, catalog] = await Promise.all([
-          api<Collection>('/watchlist'),
-          api<Metadata>('/anime/meta'),
-          api<{ items: Anime[] }>('/anime')
-        ]);
-        this.items = collection.items;
-        this.spotlightId = collection.spotlightId;
-        this.metadata = metadata;
-        this.catalog = catalog.items;
-      } catch (error) {
-        this.loadError = error instanceof Error ? error.message : 'Unable to load collection.';
-      } finally {
-        this.loading = false;
-      }
+      this.loadPromise = (async () => {
+        try {
+          const collection = await api<Collection>('/watchlist');
+          this.items = collection.items;
+          this.spotlightId = collection.spotlightId;
+          this.loaded = true;
+        } catch (error) {
+          this.loadError = error instanceof Error ? error.message : 'Unable to load collection.';
+        } finally {
+          this.loading = false;
+          this.loadPromise = null;
+        }
+      })();
+      return this.loadPromise;
+    },
+    async loadMetadata() {
+      if (this.metadata.genres.length && this.catalog.length) return;
+      const [metadata, catalog] = await Promise.all([
+        api<Metadata>('/anime/meta'),
+        api<{ items: Anime[] }>('/anime')
+      ]);
+      this.metadata = metadata;
+      this.catalog = catalog.items;
     },
     async mutate<T>(operation: () => Promise<T>): Promise<T | undefined> {
       if (this.busy) return;

@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
     bind() {
       observeSession((session) => {
         this.user = session?.user ?? null;
+        if (session) this.sessionError = '';
       });
     },
     async restore() {
@@ -25,12 +26,16 @@ export const useAuthStore = defineStore('auth', {
         try {
           await refreshSession();
           this.sessionError = '';
-        } catch (error) {
-          if (!(error instanceof ApiError) || error.status !== 401)
-            this.sessionError =
-              error instanceof Error ? error.message : 'Unable to restore session.';
-        } finally {
           this.restored = true;
+        } catch (error) {
+          if (error instanceof ApiError && error.status === 401) {
+            this.sessionError = '';
+            this.restored = true;
+          } else {
+            this.sessionError =
+              'We could not reconnect to AniTrack. Your session may still be valid. Please try again.';
+          }
+        } finally {
           this.restorePromise = null;
         }
       })();

@@ -1,6 +1,23 @@
 :root {
   color-scheme: dark;
 }
+/* Keep the existing typography when Quasar's base stylesheet is loaded. */
+body {
+  font-size: 16px;
+}
+body.body--dark {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+}
+.anitrack-layout {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body.capacitor .app-header {
+  height: calc(76px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+}
 a {
   color: inherit;
 }

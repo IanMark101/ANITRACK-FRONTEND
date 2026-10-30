@@ -1,29 +1,38 @@
 {
   "name": "anitrack-frontend",
   "version": "1.0.0",
+  "productName": "AniTrack",
+  "description": "Your anime journey, in one place.",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1",
-    "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run",
-    "lint": "eslint ."
+    "dev": "node scripts/tooling.mjs quasar dev",
+    "build": "npm run typecheck && node scripts/tooling.mjs quasar build",
+    "preview": "node scripts/tooling.mjs vite preview --host 127.0.0.1 --port 4173 --outDir dist/spa",
+    "typecheck": "node scripts/tooling.mjs vue-tsc --noEmit",
+    "test": "node scripts/tooling.mjs vitest run",
+    "lint": "eslint .",
+    "postinstall": "node scripts/tooling.mjs quasar prepare --silent",
+    "dev:android": "node scripts/tooling.mjs quasar dev -m capacitor -T android",
+    "build:android": "npm run typecheck && node scripts/tooling.mjs quasar build -m capacitor -T android",
+    "prepare:android": "node scripts/tooling.mjs quasar build -m capacitor -T android --debug --skip-pkg"
   },
   "dependencies": {
     "@fontsource/outfit": "^5.2.8",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@phosphor-icons/vue": "^2.2.1",
     "gsap": "^3.14.2",
+    "@capacitor/core": "^8.5.3",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
-    "vue-router": "^4.6.3"
+    "vue-router": "^5.4.0",
+    "quasar": "^2.35.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
+    "@quasar/app-vite": "^3.10.3",
     "typescript": "^5.9.3",
-    "vite": "^7.1.10",
+    "vite": "^8.0.0",
     "vitest": "^4.1.11",
     "vue-tsc": "^3.1.1",
     "@eslint/js": "^9.39.0",
@@ -35,6 +44,6 @@
     "@types/node": "^24.8.1"
   },
   "engines": {
-    "node": ">=22.12"
+    "node": "^22.22.0 || ^24.0.0 || >=26"
   }
 }

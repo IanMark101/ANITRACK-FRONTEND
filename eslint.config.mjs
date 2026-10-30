@@ -4,7 +4,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default [
-  { ignores: ['**/node_modules/**', '**/dist/**', 'artifacts/**'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', 'artifacts/**', '.quasar/**', '.tools/**', 'quasar.config.*.temporary.compiled*', 'src-capacitor/android/**', 'src-capacitor/ios/**', 'src-capacitor/www/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...vue.configs['flat/essential'],

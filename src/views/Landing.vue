@@ -142,33 +142,33 @@ onBeforeUnmount(() => {
           <RouterLink :to="destination" class="btn btn-primary-action large-button"
             >{{ auth.authenticated ? 'Go to dashboard' : 'Start your watchlist' }}
             <PhArrowUpRight :size="21" /></RouterLink
-          ><a href="#discover" class="text-action"
-            >Find your next watch <PhArrowRight :size="20"
-          /></a>
+          ><RouterLink to="/assistant" class="text-action"
+            >Try Anime Assistant <PhArrowRight :size="20"
+          /></RouterLink>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
         <div class="hero-art-column art-column-one">
           <img
-            src="/images/jujutsukaisen.jpg"
+            src="/images/editorial/frieren.webp"
             alt=""
             width="250"
             height="360"
             fetchpriority="high"
-          /><img src="/images/komi.jpg" alt="" width="250" height="360" />
+          /><img src="/images/editorial/spy-family.webp" alt="" width="250" height="360" />
         </div>
         <div class="hero-art-column art-column-two">
           <img
-            src="/images/vinlandsaga.jpg"
+            src="/images/editorial/fullmetal-alchemist.webp"
             alt=""
             width="250"
             height="360"
             fetchpriority="high"
-          /><img src="/images/onepiece.jpg" alt="" width="250" height="360" />
+          /><img src="/images/editorial/cowboy-bebop.webp" alt="" width="250" height="360" />
         </div>
         <div class="hero-art-column art-column-three">
-          <img src="/images/bleach.jpg" alt="" width="250" height="360" /><img
-            src="/images/hellsparadise.jpg"
+          <img src="/images/editorial/demon-slayer.webp" alt="" width="250" height="360" /><img
+            src="/images/editorial/chainsaw-man.webp"
             alt=""
             width="250"
             height="360"
@@ -200,8 +200,8 @@ onBeforeUnmount(() => {
             <p>Watching, completed, or saved for later. Keep your next adventure within reach.</p>
           </div>
           <img
-            src="/images/onepiece.jpg"
-            alt="One Piece poster"
+            src="/images/editorial/haikyu.webp"
+            alt="Haikyu anime key visual"
             loading="lazy"
             width="300"
             height="400"
@@ -220,8 +220,8 @@ onBeforeUnmount(() => {
         <article class="feature-tile feature-favorite">
           <div class="favorite-visual">
             <img
-              src="/images/komi.jpg"
-              alt="Komi Can't Communicate poster"
+              src="/images/editorial/violet-evergarden.webp"
+              alt="Violet Evergarden anime key visual"
               loading="lazy"
               width="240"
               height="340"
@@ -234,11 +234,11 @@ onBeforeUnmount(() => {
         </article>
         <article class="feature-tile feature-spotlight">
           <img
-            src="/images/vinlandsaga.jpg"
-            alt="Vinland Saga poster"
+            src="/images/editorial/howls-moving-castle.webp"
+            alt="Howl's moving castle floating among the clouds"
             loading="lazy"
-            width="500"
-            height="450"
+            width="1440"
+            height="779"
           />
           <div class="feature-copy">
             <h3>Put your favorite in the spotlight.</h3>
@@ -261,11 +261,11 @@ onBeforeUnmount(() => {
         <figure>
           <div class="journey-image">
             <img
-              src="/images/hellsparadise.jpg"
-              alt="Hell's Paradise artwork"
+              src="/images/editorial/castle-in-the-sky.webp"
+              alt="Overgrown towers and gardens of Laputa in Castle in the Sky"
               loading="lazy"
-              width="600"
-              height="500"
+              width="1440"
+              height="779"
             />
           </div>
           <figcaption>For the worlds you get lost in.</figcaption>
@@ -273,11 +273,11 @@ onBeforeUnmount(() => {
         <figure>
           <div class="journey-image">
             <img
-              src="/images/angelnextdoor.jpg"
-              alt="The Angel Next Door Spoils Me Rotten artwork"
+              src="/images/editorial/spirited-away.webp"
+              alt="Chihiro and Haku facing each other in Spirited Away"
               loading="lazy"
-              width="600"
-              height="500"
+              width="1440"
+              height="779"
             />
           </div>
           <figcaption>For the stories that stay with you.</figcaption>
@@ -289,6 +289,7 @@ onBeforeUnmount(() => {
       <div class="section-intro">
         <h2>Your next obsession<br /><span>could be right here.</span></h2>
         <p>Explore the catalog. Give a new story a place in your collection.</p>
+        <RouterLink to="/discover" class="text-action discover-library-link">Browse the full anime library <PhArrowUpRight :size="18" /></RouterLink>
       </div>
       <div v-if="loading" class="catalog-skeleton" aria-label="Loading catalog" role="status">
         <span v-for="n in 4" :key="n"></span>
@@ -337,7 +338,7 @@ onBeforeUnmount(() => {
         <div v-if="selected" class="catalog-detail">
           <div>
             <span class="catalog-genre">{{ selected.genre }}</span>
-            <h3>{{ selected.title }}</h3>
+            <h3><RouterLink :to="`/anime/local/${selected.id}`">{{ selected.title }}</RouterLink></h3>
             <p>{{ selected.synopsis }}</p>
           </div>
           <button
@@ -361,16 +362,16 @@ onBeforeUnmount(() => {
     <section class="landing-cta container">
       <img
         class="cta-landscape"
-        src="/images/next-chapter-landscape.png"
+        src="/images/editorial/next-chapter-landscape.webp"
         alt=""
         loading="lazy"
-        width="1672"
-        height="941"
+        width="1600"
+        height="900"
       />
       <h2>
         Great stories deserve
         <span class="inline-poster" aria-hidden="true"
-          ><img src="/images/naruto.jpg" alt="" loading="lazy" width="120" height="72" /></span
+          ><img src="/images/editorial/ponyo.webp" alt="" loading="lazy" width="120" height="65" /></span
         ><br /><span>a place in yours.</span>
       </h2>
       <RouterLink :to="destination" class="btn btn-primary-action large-button"
@@ -687,13 +688,13 @@ onBeforeUnmount(() => {
 .journey-image {
   overflow: hidden;
   border-radius: 16px;
-  aspect-ratio: 1.15;
+  aspect-ratio: 1.5;
 }
 .journey-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 25%;
+  object-position: center;
   transition: transform 0.7s;
 }
 .journey-image:hover img {
@@ -924,6 +925,9 @@ onBeforeUnmount(() => {
   }
   .feature-tile {
     padding: 28px;
+  }
+  .feature-favorite {
+    padding-top: 190px;
   }
   .feature-watch .feature-copy {
     max-width: 220px;

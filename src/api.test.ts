@@ -57,4 +57,28 @@ describe('API authentication refresh', () => {
     await expect(refreshSession()).rejects.toThrow('Cannot reach AniTrack');
     expect(observed).not.toHaveBeenCalled();
   });
+
+  it('retains the session on a temporary refresh error and accepts a later successful retry', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        response(503, {
+          error: { code: 'SERVICE_UNAVAILABLE', message: 'Temporarily unavailable' }
+        })
+      )
+      .mockResolvedValueOnce(
+        response(200, { accessToken: 'recovered-token', user: { id: 'user-1' } })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const { refreshSession, observeSession, setAccessToken } = await import('./api');
+    const observed = vi.fn();
+    observeSession(observed);
+    setAccessToken('current-token');
+    await expect(refreshSession()).rejects.toThrow('Temporarily unavailable');
+    expect(observed).not.toHaveBeenCalled();
+    await expect(refreshSession()).resolves.toMatchObject({ accessToken: 'recovered-token' });
+    expect(observed).toHaveBeenCalledTimes(1);
+    expect(observed).not.toHaveBeenCalledWith(null);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 });

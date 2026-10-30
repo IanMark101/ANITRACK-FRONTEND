@@ -1,6 +1,6 @@
 import type { Session } from './types';
+import { request } from './api-transport';
 
-const baseUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 let token: string | null = null;
 let refreshPromise: Promise<Session> | null = null;
 let onSession: (session: Session | null) => void = () => {};
@@ -23,7 +23,7 @@ export function observeSession(callback: typeof onSession) {
 async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}${path}`, {
+    response = await request(path, {
       ...options,
       credentials: 'include',
       headers: {
@@ -31,7 +31,7 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers
       },
-      signal: options.signal ?? AbortSignal.timeout(20000)
+      signal: options.signal ?? AbortSignal.timeout(35000)
     });
   } catch {
     throw new ApiError(
@@ -62,7 +62,12 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export function refreshSession(): Promise<Session> {
   if (!refreshPromise) {
-    refreshPromise = send<Session>('/auth/refresh', { method: 'POST' })
+    const refresh = () => send<Session>('/auth/refresh', { method: 'POST' });
+    // Browser tabs share the rotating cookie; serialize refreshes across tabs too.
+    const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+    refreshPromise = Promise.resolve(
+      locks ? locks.request('anitrack-session-refresh', refresh) : refresh()
+    )
       .then((session) => {
         setAccessToken(session.accessToken);
         onSession(session);
