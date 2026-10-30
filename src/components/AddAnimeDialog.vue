@@ -120,8 +120,8 @@ function upload(event: Event) {
   const field = event.target as HTMLInputElement;
   const file = field.files?.[0];
   if (!file) return;
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 1048576) {
-    error.value = 'Choose a JPEG, PNG, or WebP image smaller than 1 MB.';
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 262144) {
+    error.value = 'Choose a JPEG, PNG, or WebP image smaller than 256 KB.';
     field.value = '';
     return;
   }
@@ -370,7 +370,7 @@ onBeforeUnmount(cancelSearch);
                 accept="image/jpeg,image/png,image/webp"
                 :disabled="store.busy"
                 @change="upload" /></label
-            ><small>JPEG, PNG or WebP · up to 1 MB</small>
+            ><small>JPEG, PNG or WebP · up to 256 KB</small>
           </div>
         </div>
         <details v-if="store.metadata.posters.length" class="preset-covers">

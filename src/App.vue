@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { QLayout, QPageContainer } from 'quasar';
+import { QLayout, QPageContainer, QMenu } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 import {
   PhArrowUpRight,
@@ -11,11 +11,15 @@ import {
   PhSparkle,
   PhCalendarBlank,
   PhArrowClockwise,
-  PhCloudSlash
+  PhCloudSlash,
+  PhUserCircle,
+  PhStack,
+  PhDotsThree
 } from '@phosphor-icons/vue';
 import { useAuthStore } from './stores/auth';
 import { useWatchlistStore } from './stores/watchlist';
 import { useAssistantStore } from './stores/assistant';
+import './styles/collections.css';
 const auth = useAuthStore();
 const watchlist = useWatchlistStore();
 const router = useRouter();
@@ -30,13 +34,17 @@ const workspace = computed(
 const navigation = [
   { to: '/dashboard', label: 'Overview', mobile: 'Home', icon: PhHouse },
   { to: '/watchlist', label: 'My watchlist', mobile: 'Watchlist', icon: PhBooks },
+  { to: '/collections', label: 'Collections', mobile: 'Collections', icon: PhStack },
   { to: '/discover', label: 'Discover', mobile: 'Discover', icon: PhCompass },
   { to: '/assistant', label: 'Anime Assistant', mobile: 'Assistant', icon: PhSparkle },
-  { to: '/calendar', label: 'Calendar', mobile: 'Calendar', icon: PhCalendarBlank }
+  { to: '/calendar', label: 'Calendar', mobile: 'Calendar', icon: PhCalendarBlank },
+  { to: '/account', label: 'Account', mobile: 'Account', icon: PhUserCircle }
 ];
 const currentPage = computed(
-  () => navigation.find((item) => item.to === route.path)?.label || 'Anime details'
+  () => route.path.startsWith('/collections') ? 'Collections' : navigation.find((item) => item.to === route.path)?.label || 'Anime details'
 );
+const mobileNavigation = navigation.slice(0, 4);
+const moreNavigation = navigation.slice(4);
 watch(
   () => auth.user?.id,
   (next, previous) => {
@@ -44,7 +52,8 @@ watch(
     if (previous && next !== previous) assistant.$reset();
     if (!next && previous && route.meta.protected)
       router.replace({ path: '/login', query: { redirect: route.fullPath } });
-  }
+  },
+  { flush: 'sync' }
 );
 async function logout() {
   logoutError.value = '';
@@ -69,7 +78,7 @@ async function reconnect() {
 </script>
 
 <template>
-  <QLayout class="anitrack-layout" :class="{ 'workspace-mode': workspace }">
+  <QLayout class="anitrack-layout" :class="{ 'workspace-mode': workspace, 'collections-mode': route.path.startsWith('/collections') }">
     <a href="#page-content" class="skip-link">Skip to content</a>
     <main v-if="starting" class="startup-state" role="status" aria-label="Opening AniTrack">
       <span class="logo-icon" aria-hidden="true">⛩️</span>
@@ -136,13 +145,19 @@ async function reconnect() {
         </button>
       </header>
       <nav class="workspace-mobile-nav" aria-label="Mobile navigation">
-        <RouterLink v-for="item in navigation" :key="item.to" :to="item.to"
+        <RouterLink v-for="item in mobileNavigation" :key="item.to" :to="item.to"
           ><component
             :is="item.icon"
             :size="23"
             :weight="route.path === item.to ? 'fill' : 'regular'"
           /><span>{{ item.mobile }}</span></RouterLink
         >
+        <button class="mobile-more-button" :class="{ 'router-link-active': moreNavigation.some(item => item.to === route.path) }" aria-label="More navigation">
+          <PhDotsThree :size="23" /><span>More</span>
+          <QMenu class="mobile-more-menu" anchor="top right" self="bottom right" :offset="[0, 12]">
+            <nav aria-label="More destinations"><RouterLink v-for="item in moreNavigation" :key="item.to" v-close-popup :to="item.to"><component :is="item.icon" :size="21" />{{ item.label }}</RouterLink></nav>
+          </QMenu>
+        </button>
       </nav>
     </template>
     <template v-else>
@@ -154,8 +169,8 @@ async function reconnect() {
           >
           <nav class="main-nav" aria-label="Main navigation">
             <RouterLink to="/#features">Features</RouterLink
-            ><RouterLink to="/discover">Discover</RouterLink
-            ><RouterLink to="/assistant">Anime Assistant</RouterLink>
+            ><RouterLink to="/#discover">Discover</RouterLink
+            ><RouterLink to="/#assistant">Anime Assistant</RouterLink>
           </nav>
           <div class="header-actions">
             <RouterLink to="/login" class="login-link">Log in</RouterLink
@@ -170,8 +185,9 @@ async function reconnect() {
         class="mobile-app-nav"
         aria-label="Explore AniTrack"
       >
-        <RouterLink to="/discover">Discover</RouterLink
-        ><RouterLink to="/assistant">Anime Assistant</RouterLink>
+        <RouterLink to="/#features">Features</RouterLink
+        ><RouterLink to="/#discover">Discover</RouterLink
+        ><RouterLink to="/#assistant">Anime Assistant</RouterLink>
       </nav>
     </template>
     <QPageContainer v-if="!starting"
@@ -191,14 +207,14 @@ async function reconnect() {
             <PhArrowClockwise :size="19" />{{
               reconnecting ? 'Reconnecting…' : 'Try again'
             }}</button
-          ><RouterLink to="/discover">Browse anime while you wait</RouterLink>
+          ><RouterLink to="/">About AniTrack</RouterLink>
         </section>
         <RouterView v-else /></div
     ></QPageContainer>
     <footer v-if="!workspace && !starting" class="app-footer container">
       <RouterLink to="/" class="footer-wordmark">AniTrack</RouterLink>
       <p>Your anime journey, in one place.</p>
-      <RouterLink to="/discover">Discover anime <PhArrowUpRight :size="16" /></RouterLink
+      <RouterLink to="/#features">Explore AniTrack <PhArrowUpRight :size="16" /></RouterLink
       ><span>© {{ new Date().getFullYear() }} AniTrack</span>
     </footer>
   </QLayout>

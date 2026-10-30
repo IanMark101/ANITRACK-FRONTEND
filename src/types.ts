@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: 'MEMBER' | 'ADMIN';
+  emailVerifiedAt?: string | null;
 }
 export interface Anime {
   id: string;
@@ -29,11 +30,28 @@ export interface Session {
 export interface Collection {
   items: Entry[];
   spotlightId: string | null;
+  page?: number;
+  hasNext?: boolean;
 }
 export interface Metadata {
   genres: string[];
   statuses: WatchStatus[];
   posters: Pick<Anime, 'id' | 'title' | 'image'>[];
+}
+
+export interface AnimeCollection {
+  id: string;
+  name: string;
+  description: string;
+  count: number;
+  covers: { id: string; title: string; image: string }[];
+}
+export interface CollectionDetail {
+  id: string;
+  name: string;
+  description: string;
+  items: { id: string; animeId: string; title: string; image: string; provider: string | null;
+    externalId: string | null; totalEpisodes: number | null; episodesWatched: number; status: string }[];
 }
 
 export interface RemoteAnime {

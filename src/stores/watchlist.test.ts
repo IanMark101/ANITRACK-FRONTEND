@@ -11,6 +11,37 @@ beforeEach(() => {
   mocks.api.mockReset();
 });
 describe('Watchlist loading', () => {
+  it('ignores the previous account response after reset and a new account load', async () => {
+    let finish!: (value: unknown) => void;
+    mocks.api.mockReturnValueOnce(new Promise((resolve) => { finish = resolve; }));
+    const store = useWatchlistStore();
+    const previous = store.load();
+    store.$reset();
+    mocks.api.mockResolvedValueOnce({ items: [{ id: 'new-account' }], spotlightId: null });
+    await store.load();
+    finish({ items: [{ id: 'old-account' }], spotlightId: 'old-account' });
+    await previous;
+    expect(store.items[0]?.id).toBe('new-account');
+    expect(store.spotlightId).toBeNull();
+  });
+  it('does not repopulate a logged-out collection after a delayed mutation', async () => {
+    let finish!: (value: unknown) => void;
+    mocks.api.mockReturnValueOnce(new Promise((resolve) => { finish = resolve; }));
+    const store = useWatchlistStore();
+    const pending = store.add({ title: 'Previous account title' });
+    store.$reset();
+    finish({ item: { id: 'old-account' } });
+    expect(await pending).toBeUndefined();
+    expect(store.items).toEqual([]);
+  });
+  it('loads every bounded page without losing titles', async () => {
+    mocks.api.mockResolvedValueOnce({ items: [{ id: 'one' }], spotlightId: 'one', hasNext: true })
+      .mockResolvedValueOnce({ items: [{ id: 'two' }], spotlightId: 'one', hasNext: false });
+    const store = useWatchlistStore();
+    await store.load();
+    expect(store.items.map((item) => item.id)).toEqual(['one', 'two']);
+    expect(mocks.api).toHaveBeenLastCalledWith('/watchlist?page=2');
+  });
   it('coalesces concurrent loads and does not fetch the shared catalog for every page', async () => {
     let finish!: (value: unknown) => void;
     mocks.api.mockReturnValue(

@@ -1071,6 +1071,8 @@
   }
 }
 .app-dialog {
+  /* Quasar enables direct div children; our semantic section roots need this too. */
+  pointer-events: auto;
   width: 660px;
   max-width: calc(100vw - 32px) !important;
   max-height: calc(100dvh - 48px) !important;
@@ -1547,7 +1549,7 @@
   }
   .workspace-mobile-nav {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     position: fixed;
     bottom: 0;
     inset-inline: 0;
@@ -1889,3 +1891,12 @@
     transform: none;
   }
 }
+.account-page { max-width: 900px; }
+.account-panel { padding: clamp(20px, 4vw, 32px); margin-bottom: 24px; background: #18181d; border: 1px solid #303038; border-radius: 18px; }
+.account-panel h1, .account-panel h2 { margin: 0 0 16px; }
+.account-panel p { margin: 12px 0 20px; line-height: 1.6; color: #c5c5cf; }
+.account-form { display: grid; gap: 18px; max-width: 520px; margin: 20px 0; }
+.account-form label { display: grid; gap: 8px; font-weight: 600; }
+.account-form input { padding: 12px 14px; width: 100%; min-width: 0; border: 1px solid #4b4b58; border-radius: 10px; background: #101014; color: #fff; font: inherit; }
+.account-form input:focus-visible { outline: 2px solid #f35b63; outline-offset: 3px; }
+.account-link-page { max-width: 640px; padding-top: 60px; padding-bottom: 60px; }

@@ -73,9 +73,12 @@ Open another PowerShell window in the same parent folder where you created `ANIT
 ```powershell
 cd ANITRACK-PLATFORM\ANITRACK-FRONTEND
 npm ci
+npm ci --prefix src-capacitor
 Copy-Item .env.example .env
 npm run dev
 ```
+
+Install both sets of frontend dependencies, including when running only the website. Quasar resolves shared Capacitor imports through `src-capacitor/node_modules` in SPA mode too. Android Studio and the Android SDK are not needed for this JavaScript dependency install.
 
 Leave `VITE_API_URL` blank in the frontend `.env` for local development. Requests use the configured proxy to the local backend. No database URL or AI key belongs in this file. `VITE_MOBILE_API_URL` can also remain blank for the website.
 
@@ -98,6 +101,7 @@ In the frontend folder, in its separate terminal:
 ```powershell
 git pull --ff-only
 npm ci
+npm ci --prefix src-capacitor
 npm run dev
 ```
 
@@ -110,7 +114,6 @@ In either repository, `npm test`, `npm run lint`, and `npm run build` run its au
 For the Android project, from the frontend folder:
 
 ```powershell
-npm ci --prefix src-capacitor
 npm run prepare:android
 ```
 

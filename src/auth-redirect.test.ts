@@ -10,7 +10,10 @@ describe('Returning to anime after authentication', () => {
       '/assistant',
       '/discover?q=Frieren',
       '/dashboard',
-      '/watchlist'
+      '/watchlist',
+      '/account',
+      '/collections',
+      '/collections/clocal123'
     ])
       expect(safeAuthRedirect(path)).toBe(path);
   });
@@ -20,7 +23,8 @@ describe('Returning to anime after authentication', () => {
       '//example.test',
       '/\\example.test',
       '/dashboard/../../example',
-      '/anime/kitsu/../other'
+      '/anime/kitsu/../other',
+      '/collections/../account'
     ])
       expect(safeAuthRedirect(path)).toBe('/dashboard');
   });

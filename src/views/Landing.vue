@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import {
   PhArrowRight,
   PhArrowUpRight,
@@ -8,58 +7,17 @@ import {
   PhHeart,
   PhStar,
   PhPlay,
-  PhCheck,
-  PhPlus
+  PhCheck
 } from '@phosphor-icons/vue';
-import { api } from '../api';
 import { useAuthStore } from '../stores/auth';
-import { useWatchlistStore } from '../stores/watchlist';
-import type { Anime } from '../types';
+import LandingFeatures from '../components/LandingFeatures.vue';
 
 const auth = useAuthStore();
-const watchlist = useWatchlistStore();
-const router = useRouter();
 const page = ref<HTMLElement | null>(null);
-const catalog = ref<Anime[]>([]);
-const loading = ref(true);
-const error = ref('');
-const selectedId = ref('');
-const addedId = ref('');
-const addError = ref('');
-const featured = computed(() => catalog.value.slice(0, 4));
-const selected = computed(
-  () => featured.value.find((anime) => anime.id === selectedId.value) ?? featured.value[0]
-);
 const destination = computed(() => (auth.authenticated ? '/dashboard' : '/register'));
 let alive = true;
 let cleanup = () => {};
-async function loadCatalog() {
-  loading.value = true;
-  error.value = '';
-  try {
-    catalog.value = (await api<{ items: Anime[] }>('/anime')).items;
-  } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'Unable to load catalog.';
-  } finally {
-    loading.value = false;
-  }
-}
-async function addSelected() {
-  if (!selected.value) return;
-  if (!auth.authenticated) {
-    await router.push({ path: '/login', query: { redirect: '/dashboard' } });
-    return;
-  }
-  addError.value = '';
-  try {
-    const item = await watchlist.add({ animeId: selected.value.id });
-    if (item) addedId.value = selected.value.id;
-  } catch (cause) {
-    addError.value = cause instanceof Error ? cause.message : 'Could not add title.';
-  }
-}
 onMounted(async () => {
-  void loadCatalog();
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([
     import('gsap'),
     import('gsap/ScrollTrigger')
@@ -142,8 +100,8 @@ onBeforeUnmount(() => {
           <RouterLink :to="destination" class="btn btn-primary-action large-button"
             >{{ auth.authenticated ? 'Go to dashboard' : 'Start your watchlist' }}
             <PhArrowUpRight :size="21" /></RouterLink
-          ><RouterLink to="/assistant" class="text-action"
-            >Try Anime Assistant <PhArrowRight :size="20"
+          ><RouterLink to="/#assistant" class="text-action"
+            >Meet Anime Assistant <PhArrowRight :size="20"
           /></RouterLink>
         </div>
       </div>
@@ -285,79 +243,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section id="discover" class="landing-section container discover-section">
-      <div class="section-intro">
-        <h2>Your next obsession<br /><span>could be right here.</span></h2>
-        <p>Explore the catalog. Give a new story a place in your collection.</p>
-        <RouterLink to="/discover" class="text-action discover-library-link">Browse the full anime library <PhArrowUpRight :size="18" /></RouterLink>
-      </div>
-      <div v-if="loading" class="catalog-skeleton" aria-label="Loading catalog" role="status">
-        <span v-for="n in 4" :key="n"></span>
-      </div>
-      <div v-else-if="error" class="catalog-state" role="alert">
-        <h3>The catalog is taking a break.</h3>
-        <p>{{ error }}</p>
-        <button class="btn btn-glass" @click="loadCatalog">Try again</button>
-      </div>
-      <div v-else-if="!featured.length" class="catalog-state">
-        <h3>The next chapter is yours.</h3>
-        <p>The catalog is empty. Add your own title from your dashboard.</p>
-        <RouterLink :to="destination" class="text-action"
-          >Start your collection <PhArrowRight :size="18"
-        /></RouterLink>
-      </div>
-      <template v-else>
-        <div
-          class="poster-picker"
-          :style="{
-            gridTemplateColumns: featured
-              .map((anime) => (selected?.id === anime.id ? '1.6fr' : '1fr'))
-              .join(' ')
-          }"
-        >
-          <button
-            v-for="anime in featured"
-            :key="anime.id"
-            :class="['poster-choice', { selected: selected?.id === anime.id }]"
-            :aria-pressed="selected?.id === anime.id"
-            @click="
-              selectedId = anime.id;
-              addError = '';
-            "
-          >
-            <span class="poster-choice-image"
-              ><img
-                :src="anime.image"
-                :alt="`${anime.title} poster`"
-                loading="lazy"
-                width="300"
-                height="420" /></span
-            ><span>{{ anime.title }}</span>
-          </button>
-        </div>
-        <div v-if="selected" class="catalog-detail">
-          <div>
-            <span class="catalog-genre">{{ selected.genre }}</span>
-            <h3><RouterLink :to="`/anime/local/${selected.id}`">{{ selected.title }}</RouterLink></h3>
-            <p>{{ selected.synopsis }}</p>
-          </div>
-          <button
-            class="btn btn-glass"
-            :disabled="watchlist.busy || addedId === selected.id"
-            @click="addSelected"
-          >
-            <component :is="addedId === selected.id ? PhCheck : PhPlus" :size="19" />{{
-              watchlist.busy
-                ? 'Adding…'
-                : addedId === selected.id
-                  ? 'Added to watchlist'
-                  : 'Add to watchlist'
-            }}
-          </button>
-        </div>
-        <p v-if="addError" class="form-error" role="alert">{{ addError }}</p>
-      </template>
-    </section>
+    <LandingFeatures />
 
     <section class="landing-cta container">
       <img
@@ -705,105 +591,6 @@ onBeforeUnmount(() => {
   margin-top: 18px;
   font-size: 13px;
 }
-.discover-section {
-  padding-top: 140px;
-}
-.poster-picker {
-  display: grid;
-  gap: 20px;
-  align-items: start;
-}
-.poster-choice {
-  border: 0;
-  background: transparent;
-  color: #b8b8c3;
-  text-align: left;
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-  min-width: 0;
-}
-.poster-choice-image {
-  display: block;
-  height: 330px;
-  overflow: hidden;
-  border-radius: 12px;
-  border: 2px solid transparent;
-  opacity: 0.6;
-  transition:
-    opacity 0.3s,
-    border-color 0.3s;
-}
-.poster-choice img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.7s;
-}
-.poster-choice:hover img {
-  transform: scale(1.04);
-}
-.poster-choice.selected .poster-choice-image {
-  border-color: #e50914;
-  opacity: 1;
-}
-.poster-choice > span:last-child {
-  display: block;
-  margin-top: 16px;
-  line-height: 1.6;
-}
-.catalog-detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 40px;
-  margin-top: 35px;
-  padding-top: 28px;
-  border-top: 1px solid #2c2c33;
-}
-.catalog-detail h3 {
-  font-family: Outfit, sans-serif;
-  font-size: 26px;
-  font-weight: 600;
-  margin: 8px 0 12px;
-}
-.catalog-detail p {
-  font-size: 13px;
-  line-height: 1.85;
-  color: #a9a9b5;
-  max-width: 650px;
-}
-.catalog-detail button {
-  flex-shrink: 0;
-}
-.catalog-genre {
-  color: #f3b3b8;
-  font-size: 11px;
-}
-.catalog-state {
-  padding: 50px;
-  border: 1px solid #303038;
-  border-radius: 16px;
-}
-.catalog-state h3 {
-  font-size: 24px;
-  font-family: Outfit, sans-serif;
-}
-.catalog-state p {
-  color: #b8b8c3;
-  font-size: 14px;
-  margin: 15px 0 24px;
-}
-.catalog-skeleton {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-.catalog-skeleton span {
-  height: 350px;
-  background: #1c1c23;
-  border-radius: 12px;
-}
 .landing-cta {
   position: relative;
   isolation: isolate;
@@ -887,20 +674,9 @@ onBeforeUnmount(() => {
   .genre-strip:hover .genre-track {
     animation-play-state: paused;
   }
-  .catalog-skeleton span {
-    animation: catalog-pulse 1.5s ease-in-out infinite alternate;
-  }
-  .catalog-skeleton span:nth-child(2) {
-    animation-delay: 0.2s;
-  }
   @keyframes genres-drift {
     to {
       transform: translateX(-440px);
-    }
-  }
-  @keyframes catalog-pulse {
-    to {
-      opacity: 0.45;
     }
   }
 }
@@ -1062,38 +838,6 @@ onBeforeUnmount(() => {
   }
   .journey-image {
     aspect-ratio: 1.25;
-  }
-  .poster-picker {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 20px 14px;
-  }
-  .poster-choice-image {
-    height: 230px;
-  }
-  .poster-choice > span:last-child {
-    font-size: 11px;
-  }
-  .catalog-detail {
-    display: block;
-  }
-  .catalog-detail h3 {
-    font-size: 24px;
-  }
-  .catalog-detail button {
-    margin-top: 20px;
-  }
-  .catalog-detail p {
-    font-size: 12px;
-  }
-  .catalog-state {
-    padding: 28px;
-  }
-  .catalog-skeleton {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-  .catalog-skeleton span {
-    height: 230px;
   }
   .landing-cta {
     padding: 100px 20px;

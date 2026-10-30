@@ -3,6 +3,7 @@ import { request } from './api-transport';
 
 let token: string | null = null;
 let refreshPromise: Promise<Session> | null = null;
+let identityVersion = 0;
 let onSession: (session: Session | null) => void = () => {};
 export class ApiError extends Error {
   constructor(
@@ -14,6 +15,10 @@ export class ApiError extends Error {
   }
 }
 export function setAccessToken(value: string | null) {
+  if (value === null) {
+    identityVersion++;
+    refreshPromise = null;
+  }
   token = value;
 }
 export function observeSession(callback: typeof onSession) {
@@ -62,39 +67,49 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export function refreshSession(): Promise<Session> {
   if (!refreshPromise) {
+    const version = identityVersion;
     const refresh = () => send<Session>('/auth/refresh', { method: 'POST' });
     // Browser tabs share the rotating cookie; serialize refreshes across tabs too.
     const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
-    refreshPromise = Promise.resolve(
+    const pending = Promise.resolve(
       locks ? locks.request('anitrack-session-refresh', refresh) : refresh()
     )
       .then((session) => {
+        if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
         setAccessToken(session.accessToken);
         onSession(session);
         return session;
       })
       .catch((error) => {
-        if (error instanceof ApiError && error.status === 401) {
+        if (version === identityVersion && error instanceof ApiError && error.status === 401) {
           setAccessToken(null);
           onSession(null);
         }
         throw error;
       })
       .finally(() => {
-        refreshPromise = null;
+        if (refreshPromise === pending) refreshPromise = null;
       });
+    refreshPromise = pending;
   }
   return refreshPromise;
 }
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const version = identityVersion;
   try {
-    return await send<T>(path, options);
+    const result = await send<T>(path, options);
+    if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
+    return result;
   } catch (error) {
+    if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
     if (!(error instanceof ApiError) || error.status !== 401 || path.startsWith('/auth/'))
       throw error;
     await refreshSession();
-    return send<T>(path, options);
+    if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
+    const result = await send<T>(path, options);
+    if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
+    return result;
   }
 }
 export const jsonBody = (value: unknown) => JSON.stringify(value);

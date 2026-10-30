@@ -1,5 +1,11 @@
 # AniTrack Frontend
 
+The landing page explains AniTrack and links to registration/login. Discover, Anime Assistant, anime details, and all personal workspace pages require authentication. Guest links explain the features on the landing page; direct feature URLs lead to login and preserve the intended destination. Catalog, discovery and AI APIs also require a valid session.
+
+`/collections` organizes saved anime into private themed groups, with the reference-inspired charcoal cards and overlapping cover art. Create, rename, describe or delete groups; add saved titles, remove them from a group and change their order. One anime can belong to several collections. Removing a group preserves watchlist progress. Limits are 20 groups and 100 titles per group. [Design and responsive review](docs/COLLECTIONS-DESIGN.md).
+
+The Account page (`/account`) supports profile changes, email verification, password changes and confirmed account deletion. Password recovery starts at `/forgot-password`; reset and verification links open `/reset-password` and `/verify-email`. Email delivery requires backend SMTP configuration. Browser journey checks run with `npm run test:e2e`.
+
 Moving to another PC? Follow [the complete clone, environment, database, and run guide](docs/SETUP-ANOTHER-DEVICE.md), which covers both repositories.
 
 Signed-in users open `/dashboard`, a personal overview with a featured anime, continue-watching and saved-for-later carousels, and discovery suggestions. `/watchlist` is the full collection with search, status filters, sorting, favorites, and progress/rating controls. **Add anime** opens a catalog search dialog; **Create a custom entry** provides the manual form inside the same dialog. Desktop navigation stays in a sidebar; phones use a bottom navigation bar.
@@ -8,7 +14,7 @@ Temporary server failures keep the session credential and offer reconnection on 
 
 AniTrack includes `/discover` for anime search, genre filtering, popular/top-rated lists, seasonal browsing, and upcoming releases; `/anime/kitsu/:id` for details, trailers, paginated episodes, related titles, and category-based suggestions; and `/calendar` for available recent episode dates from your Watching titles. Existing catalog and custom entries have local detail pages at `/anime/local/:id`. Search results can be imported into the private watchlist in one click. Dashboard cards and detail pages support episode progress, including +1/-1 buttons and an exact count editor.
 
-Open **Anime Assistant** (`/assistant`) to find a forgotten title from story clues or get recommendations from genres, moods, and preferences. Examples fill the description for editing before submission. Follow-up messages refine the current search; **New search** starts over. Results link to real Kitsu detail pages and support the existing watchlist import. Signed-in users can hide saved anime from recommendations. Guests can search and are prompted to log in when saving.
+Open **Anime Assistant** (`/assistant`) after signing in to find a forgotten title from story clues or get recommendations from genres, moods, and preferences. Examples fill the description for editing before submission. Follow-up messages refine the current search; **New search** starts over. Results link to real Kitsu detail pages and support the existing watchlist import. Users can hide saved anime from recommendations. Guests cannot access the assistant or its API.
 
 Configure `GEMINI_API_KEY` only in the backend `.env`; no frontend AI secret is needed. Searches send the description and recent search messages to Google Gemini and can take up to a minute. Search state stays in memory while navigating and clears on reload or account changes. AniTrack does not save assistant conversations to the database. Suggestions are not guaranteed identifications; vague descriptions may need another clue. Temporary Gemini errors preserve the draft for retrying.
 
@@ -20,9 +26,12 @@ Use Node.js 24 LTS and npm 11 (Node 22.22+ also works). Run commands from this f
 
 ```sh
 npm install
+npm ci --prefix src-capacitor
 cp .env.example .env
 npm run dev
 ```
+
+The `src-capacitor` dependency install is required for the website too: Quasar resolves shared Capacitor imports from that folder in every mode. This installs JavaScript packages; Android Studio and the Android SDK are only needed for native Android development.
 
 In PowerShell, use `Copy-Item .env.example .env` instead of `cp` if preferred. Leave `VITE_API_URL` empty for the development proxy to `http://localhost:3001`. Start the backend separately and open `http://localhost:5173`; its origin must match the backend's `CLIENT_ORIGIN`.
 

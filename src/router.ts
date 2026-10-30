@@ -9,25 +9,30 @@ export default defineRouter(({ store }) => {
         ? createWebHashHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE)
         : createWebHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
     routes: [
+      { path: '/collections/:id?', component: () => import('./views/Collections.vue'), meta: { protected: true, title: 'Your collections' } },
+      { path: '/account', component: () => import('./views/Account.vue'), meta: { protected: true, title: 'Your account' } },
+      { path: '/forgot-password', component: () => import('./views/AccountLink.vue'), meta: { title: 'Reset your password' } },
+      { path: '/reset-password', component: () => import('./views/AccountLink.vue'), meta: { title: 'Choose a password' } },
+      { path: '/verify-email', component: () => import('./views/AccountLink.vue'), meta: { title: 'Verify your email' } },
       {
         path: '/assistant',
         component: () => import('./views/Assistant.vue'),
-        meta: { title: 'Anime Assistant' }
+        meta: { protected: true, title: 'Anime Assistant' }
       },
       {
         path: '/discover',
         component: () => import('./views/Discover.vue'),
-        meta: { title: 'Discover anime' }
+        meta: { protected: true, title: 'Discover anime' }
       },
       {
         path: '/anime/kitsu/:id',
         component: () => import('./views/AnimeDetails.vue'),
-        meta: { title: 'Anime details' }
+        meta: { protected: true, title: 'Anime details' }
       },
       {
         path: '/anime/local/:id',
         component: () => import('./views/CatalogDetails.vue'),
-        meta: { title: 'Anime details' }
+        meta: { protected: true, title: 'Anime details' }
       },
       {
         path: '/calendar',
@@ -66,7 +71,7 @@ export default defineRouter(({ store }) => {
       }
     ],
     scrollBehavior(to) {
-      return to.hash ? { el: to.hash, behavior: 'smooth' } : { top: 0 };
+      return to.hash && !to.hash.startsWith('#token=') ? { el: to.hash, behavior: 'smooth' } : { top: 0 };
     }
   });
   router.beforeEach(async (to) => {

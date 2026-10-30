@@ -9,6 +9,13 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const registering = computed(() => route.path === '/register');
+const accessMessage = computed(() => {
+  const target = safeAuthRedirect(route.query.redirect);
+  if (target.startsWith('/discover')) return 'Log in to discover anime and save your next watch.';
+  if (target.startsWith('/assistant')) return 'Log in to use Anime Assistant.';
+  if (target.startsWith('/anime/')) return 'Log in to view anime details and track your progress.';
+  return 'Your next chapter is waiting.';
+});
 const artwork = computed(() =>
   registering.value
     ? {
@@ -80,9 +87,10 @@ async function submit() {
       <RouterLink to="/" class="back-link">Back to AniTrack</RouterLink>
       <h2>{{ registering ? 'Start your collection.' : 'Welcome back.' }}</h2>
       <p>
-        {{ registering ? 'Make room for your next favorite.' : 'Your next chapter is waiting.' }}
+        {{ registering ? 'Make room for your next favorite.' : accessMessage }}
       </p>
       <p v-if="auth.sessionError" class="session-notice">{{ auth.sessionError }}</p>
+      <RouterLink v-if="!registering" to="/forgot-password" class="text-action">Forgot your password?</RouterLink>
       <form @submit.prevent="submit">
         <div v-if="error" id="auth-error" class="form-error" role="alert">{{ error }}</div>
         <div v-if="registering" class="form-group">
