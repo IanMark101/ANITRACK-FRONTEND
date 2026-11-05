@@ -29,10 +29,9 @@ onMounted(async () => {
     '(prefers-reduced-motion: no-preference)',
     () => {
       gsap.from('.landing-hero .hero-copy > *', {
-        y: 25,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.12,
+        y: 16,
+        duration: 0.6,
+        stagger: 0.08,
         ease: 'power3.out'
       });
       gsap.from('.hero-art-column', {
