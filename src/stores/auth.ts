@@ -8,10 +8,15 @@ export const useAuthStore = defineStore('auth', {
     user: null as User | null,
     restored: false,
     loading: false,
+    verificationEmailSent: null as boolean | null,
+    verificationRetryAt: 0,
     sessionError: '',
     restorePromise: null as Promise<void> | null
   }),
-  getters: { authenticated: (state) => Boolean(state.user) },
+  getters: {
+    authenticated: (state) => Boolean(state.user),
+    verified: (state) => Boolean(state.user?.emailVerifiedAt)
+  },
   actions: {
     bind() {
       observeSession((session) => {
@@ -60,6 +65,8 @@ export const useAuthStore = defineStore('auth', {
         });
         if (restoration !== this.restoration) return;
         this.user = session.user;
+        this.verificationEmailSent = session.verificationEmailSent ?? null;
+        this.verificationRetryAt = session.verificationEmailSent ? Date.now() + 60_000 : 0;
         setAccessToken(session.accessToken);
         this.sessionError = '';
         this.restored = true;
@@ -76,11 +83,18 @@ export const useAuthStore = defineStore('auth', {
         this.loading = false;
       }
     },
+    async checkVerification() {
+      const result = await api<{ user: User }>('/auth/me');
+      if (this.user?.id === result.user.id) this.user = result.user;
+      return Boolean(this.user?.emailVerifiedAt);
+    },
     clear() {
       this.restoration++;
       this.restorePromise = null;
       setAccessToken(null);
       this.user = null;
+      this.verificationEmailSent = null;
+      this.verificationRetryAt = 0;
       this.restored = true;
       this.sessionError = '';
     }

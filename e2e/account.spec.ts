@@ -1,17 +1,17 @@
 import { test, expect, type Page } from '@playwright/test';
 
 async function fakeApi(page: Page, signedIn = false) {
-  let user = signedIn ? { id: 'browser-test', name: 'Browser Tester', email: 'browser@example.test', role: 'MEMBER', emailVerifiedAt: null } : null;
+  let user = signedIn ? { id: 'browser-test', name: 'Browser Tester', email: 'browser@example.test', role: 'MEMBER', emailVerifiedAt: '2026-11-02T00:00:00.000Z' as string | null } : null;
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname.replace('/api', '');
     const method = route.request().method();
     const ok = (body: unknown) => route.fulfill({ json: body });
     if (path === '/auth/refresh') return user ? ok({ user, accessToken: 'test-token' })
-      : route.fulfill({ status: 401, json: { error: { code: 'UNAUTHENTICATED', message: 'Please sign in.' } } });
+      : route.fulfill({ status: 204 });
     if (path === '/auth/register' || path === '/auth/login') {
       const input = route.request().postDataJSON();
       user = { id: 'browser-test', name: input.name || 'Browser Tester', email: input.email, role: 'MEMBER', emailVerifiedAt: null };
-      return ok({ user, accessToken: 'test-token' });
+      return ok({ user, accessToken: 'test-token', verificationEmailSent: path === '/auth/register' });
     }
     if (path === '/auth/logout' || (path === '/account' && method === 'DELETE')) {
       user = null; return route.fulfill({ status: 204 });
@@ -20,8 +20,13 @@ async function fakeApi(page: Page, signedIn = false) {
       user = { ...user!, name: route.request().postDataJSON().name }; return ok({ user });
     }
     if (path === '/auth/password/forgot') return ok({ message: 'If an account matches that email, a password-reset link will be sent.' });
+    if (path === '/auth/me') return ok({ user });
+    if (path === '/auth/email/verify') {
+      if (user) user.emailVerifiedAt = '2026-11-02T00:00:00.000Z';
+      return route.fulfill({ status: 204 });
+    }
     if (path === '/auth/email/request') return ok({ message: 'A verification link has been sent.' });
-    if (path === '/auth/password/reset' || path === '/auth/email/verify' || path === '/account/password') return route.fulfill({ status: 204 });
+    if (path === '/auth/password/reset' || path === '/account/password') return route.fulfill({ status: 204 });
     if (path === '/watchlist') return ok({ items: [], spotlightId: null, hasNext: false });
     if (path === '/anime/meta') return ok({ genres: ['Action', 'Adventure'], statuses: ['Watching', 'Completed', 'Plan to Watch'], posters: [] });
     if (path === '/discovery' || path === '/anime') return ok({ items: [], hasNext: false });
@@ -36,13 +41,16 @@ test('registration, profile update, logout and password-recovery navigation', as
   await page.getByLabel('Email address', { exact: true }).fill('browser@example.test');
   await page.getByLabel('Password', { exact: true }).fill('browser-test-password-1982');
   await page.getByRole('button', { name: 'Create your account' }).click();
+  await expect(page).toHaveURL(/\/check-email\?redirect=/);
+  await page.goto('/verify-email#token=' + 'b'.repeat(43));
+  await page.getByRole('button', { name: 'Verify email', exact: true }).click();
+  await page.getByRole('link', { name: 'Continue to AniTrack', exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto('/account');
   await page.getByLabel('Your name', { exact: true }).fill('Updated Browser Tester');
   await page.getByRole('button', { name: 'Save profile', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Your name has been updated');
-  await page.getByRole('button', { name: 'Send verification email', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('verification link');
+  await expect(page.getByText('Email verified', { exact: true })).toBeVisible();
   await page.locator('button[aria-label="Log out"]:visible').click();
   await page.goto('/login');
   await page.getByRole('link', { name: 'Forgot your password?' }).click();
@@ -74,7 +82,7 @@ test('email verification requires explicit confirmation', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Verify email', exact: true })).toBeVisible();
   expect(verifies).toBe(0);
   await page.getByRole('button', { name: 'Verify email', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Your email is verified');
+  await expect(page.getByRole('status')).toContainText('now verified');
   expect(verifies).toBe(1);
 });
 
@@ -95,5 +103,18 @@ test('mobile account page fits and deletion requires explicit confirmation', asy
   await page.getByLabel('Password', { exact: true }).fill('browser-test-password');
   await page.getByLabel('Type DELETE', { exact: true }).fill('DELETE');
   await submit.click();
-  await expect(page).toHaveURL('http://127.0.0.1:5181/');
+  await expect(page).toHaveURL(url => url.pathname === '/');
+});
+
+test('login can retry a temporary session connection failure without reloading', async ({ page }) => {
+  let attempts = 0;
+  await page.route('**/api/auth/refresh', route => route.fulfill(++attempts === 1
+    ? { status: 503, json: { error: { code: 'TEMPORARY_FAILURE', message: 'Try again shortly.' } } }
+    : { status: 204 }));
+  await page.goto('/login');
+  await expect(page.getByRole('alert')).toContainText('could not reconnect');
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await expect(page.getByLabel('Email address', { exact: true })).toBeVisible();
+  expect(attempts).toBe(2);
 });

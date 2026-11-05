@@ -1,10 +1,10 @@
 # AniTrack Frontend
 
-The landing page explains AniTrack and links to registration/login. Discover, Anime Assistant, anime details, and all personal workspace pages require authentication. Guest links explain the features on the landing page; direct feature URLs lead to login and preserve the intended destination. Catalog, discovery and AI APIs also require a valid session.
+The landing page explains AniTrack and links to registration/login. Discover, Anime Assistant, anime details, and all personal workspace pages require authentication and verified email. Guest links explain the features on the landing page; direct feature URLs lead to login and preserve the intended destination. Unverified accounts, including older accounts, go to /check-email without loading workspace pages or navigation. Catalog, discovery, AI and personal APIs independently enforce the same requirement.
 
 `/collections` organizes saved anime into private themed groups, with the reference-inspired charcoal cards and overlapping cover art. Create, rename, describe or delete groups; add saved titles, remove them from a group and change their order. One anime can belong to several collections. Removing a group preserves watchlist progress. Limits are 20 groups and 100 titles per group. [Design and responsive review](docs/COLLECTIONS-DESIGN.md).
 
-The Account page (`/account`) supports profile changes, email verification, password changes and confirmed account deletion. Password recovery starts at `/forgot-password`; reset and verification links open `/reset-password` and `/verify-email`. Email delivery requires backend SMTP configuration. Browser journey checks run with `npm run test:e2e`.
+Registration attempts to send a verification email and opens /check-email. The screen offers a status check, a rate-limited resend and account switching. Failed delivery leaves the pending account recoverable; it never grants workspace access. Open the emailed /verify-email link, explicitly confirm verification, then continue to the intended page. The Account page (/account) supports profile changes, verification status, password changes and confirmed account deletion. Password recovery starts at /forgot-password; reset links open /reset-password. Backend SMTP configuration is required for real email delivery. Browser journey checks run with npm run test:e2e. See [required verification](docs/REQUIRED-VERIFICATION.md).
 
 Moving to another PC? Follow [the complete clone, environment, database, and run guide](docs/SETUP-ANOTHER-DEVICE.md), which covers both repositories.
 
@@ -59,7 +59,7 @@ npm run prepare:android
 
 `prepare:android` compiles debug web assets and syncs them into the native project without producing an APK. In an Android emulator, these debug assets use `http://10.0.2.2:3001/api` by default to reach the backend on this PC. A physical phone needs an explicit reachable `VITE_MOBILE_API_URL`; localhost refers to the phone itself. The debug Android manifest permits HTTP for development; release builds require HTTPS.
 
-To run the synced project, open `src-capacitor/android` in Android Studio and choose an emulator or connected device. Use Android Studio Otter 2025.2.1 or newer, its bundled JDK, and Android SDK 36. These tools are not installed automatically by npm. The current project targets Android API 36, minimum API 24.
+To run the synced project, open `src-capacitor/android` in Android Studio and choose a connected device. Use JDK 21 with the checked-in Gradle 8.14.3 wrapper and Android SDK 36. Recent Android Studio releases may bundle JDK 25; select JDK 21 explicitly for this project. These tools are not installed automatically by npm. The current project targets Android API 36, minimum API 24. [Physical-phone setup and local Wi-Fi operation](docs/ANDROID-LOCAL-SETUP.md).
 
 For live reload, `npm run dev:android` starts Quasar's native development mode. With the default loopback server, run `adb reverse tcp:5173 tcp:5173` for the selected Android device first. A remote phone also needs a reachable backend URL. Stop the regular web dev server first because both modes use port 5173.
 
@@ -69,8 +69,8 @@ Before a release build, deploy the backend and set `VITE_MOBILE_API_URL` in `.en
 npm run build:android
 ```
 
-Configure signing in Android Studio before distributing the app. Native API calls use Capacitor HTTP and its platform cookie handling; browser calls retain fetch and the same-site proxy. Native login persistence, hardware Back, keyboard, safe areas, and release packaging still require emulator/device testing. A successful asset sync does not verify those behaviors.
+Configure signing in Android Studio before distributing a production release. Native API calls use Capacitor HTTP and its platform cookie handling; browser calls retain fetch and the same-site proxy. The debug APK has been built, installed and exercised on an Infinix Note 30 running Android 14. Current results and limits are recorded in [the execution audit](docs/EXECUTION-AUDIT-2026-11-05.md). A successful asset sync alone does not verify native behavior.
 
-On this PC the scripts can use the ignored local Node runtime in `.tools/node/`, since the globally installed Node 22.17 is older than Quasar CLI 3 supports. On another PC, install Node 24 LTS normally; the local runtime is not part of the repository.
+On this PC Node 26.13.0 is installed. On another PC, install a supported Node version normally; ignored local runtimes are not part of the repository.
 
 References: [Quasar Capacitor configuration](https://quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor/), [supported native tool versions](https://quasar.dev/quasar-cli-vite/developing-capacitor-apps/capacitor-version-support/), [Capacitor HTTP](https://capacitorjs.com/docs/apis/http).

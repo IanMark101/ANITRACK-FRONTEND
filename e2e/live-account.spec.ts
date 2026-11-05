@@ -1,8 +1,10 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 test('live temporary account can register, manage a custom title and delete its data', async ({ page, request }) => {
-  test.skip(!process.env.ANITRACK_LIVE_SMOKE_URL, 'Opt in with a reachable development frontend URL.');
+  const mailbox = process.env.ANITRACK_TEST_MAILBOX_FILE;
+  test.skip(!process.env.ANITRACK_LIVE_SMOKE_URL || !mailbox, 'Use an isolated development server with a captured test mailbox; never send mail to test addresses.');
   test.setTimeout(240000);
   const email = `temporary-ui-${randomUUID()}@example.test`;
   const password = randomBytes(24).toString('base64url');
@@ -18,6 +20,18 @@ test('live temporary account can register, manage a custom title and delete its 
     const session = await (await registered).json();
     expect(session.user?.id).toBeTruthy();
     userId = session.user.id;
+    await expect(page.getByRole('heading', { name: 'Check your email.' })).toBeVisible();
+    let verificationToken = '';
+    await expect.poll(async () => {
+      try {
+        const deliveries = JSON.parse(await readFile(mailbox!, 'utf8')) as { to: string; purpose: string; token: string }[];
+        verificationToken = deliveries.find(mail => mail.to === email && mail.purpose === 'EMAIL_VERIFICATION')?.token || '';
+        return Boolean(verificationToken);
+      } catch { return false; }
+    }, { timeout: 20000 }).toBe(true);
+    await page.goto('/verify-email#token=' + verificationToken);
+    await page.getByRole('button', { name: 'Verify email', exact: true }).click();
+    await page.getByRole('link', { name: 'Continue to AniTrack', exact: true }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
     await page.getByRole('button', { name: 'Add anime', exact: true }).click();
     await page.getByRole('button', { name: 'Create a custom entry', exact: true }).click();

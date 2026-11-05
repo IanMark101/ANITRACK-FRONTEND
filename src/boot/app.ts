@@ -10,5 +10,6 @@ import '../styles/app.css';
 import '../styles/discovery.css';
 import '../styles/assistant.css';
 import '../styles/workspace.css';
+import '../styles/mobile.css';
 
 export default () => {};

@@ -1,6 +1,7 @@
 import { defineRouter } from '#q-app';
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 import { useAuthStore } from './stores/auth';
+import { safeAuthRedirect } from './auth-redirect';
 
 export default defineRouter(({ store }) => {
   const router = createRouter({
@@ -9,6 +10,7 @@ export default defineRouter(({ store }) => {
         ? createWebHashHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE)
         : createWebHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
     routes: [
+      { path: '/check-email', component: () => import('./views/CheckEmail.vue'), meta: { protected: true, allowUnverified: true, title: 'Check your email' } },
       { path: '/collections/:id?', component: () => import('./views/Collections.vue'), meta: { protected: true, title: 'Your collections' } },
       { path: '/account', component: () => import('./views/Account.vue'), meta: { protected: true, title: 'Your account' } },
       { path: '/forgot-password', component: () => import('./views/AccountLink.vue'), meta: { title: 'Reset your password' } },
@@ -79,8 +81,12 @@ export default defineRouter(({ store }) => {
     await auth.restore();
     if (to.meta.protected && !auth.authenticated && !auth.sessionError)
       return { path: '/login', query: { redirect: to.fullPath } };
-    if (to.path === '/' && auth.authenticated) return '/dashboard';
-    if (to.meta.guestOnly && auth.authenticated) return '/dashboard';
+    if (auth.authenticated && !auth.verified && to.meta.protected && !to.meta.allowUnverified)
+      return { path: '/check-email', query: { redirect: safeAuthRedirect(to.fullPath) } };
+    if (auth.authenticated && (to.path === '/' || to.meta.guestOnly))
+      return auth.verified ? safeAuthRedirect(to.query.redirect)
+        : { path: '/check-email', query: { redirect: safeAuthRedirect(to.query.redirect) } };
+    if (to.path === '/check-email' && auth.verified) return safeAuthRedirect(to.query.redirect);
   });
   router.afterEach((to) => {
     document.title = `AniTrack | ${to.meta.title ?? 'Anime watchlist'}`;

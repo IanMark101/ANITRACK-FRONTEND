@@ -26,6 +26,7 @@ export interface Entry extends Anime {
 export interface Session {
   user: User;
   accessToken: string;
+  verificationEmailSent?: boolean;
 }
 export interface Collection {
   items: Entry[];

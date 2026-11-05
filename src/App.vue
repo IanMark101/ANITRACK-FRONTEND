@@ -19,17 +19,19 @@ import {
 import { useAuthStore } from './stores/auth';
 import { useWatchlistStore } from './stores/watchlist';
 import { useAssistantStore } from './stores/assistant';
+import BrandMark from './components/BrandMark.vue';
 import './styles/collections.css';
 const auth = useAuthStore();
 const watchlist = useWatchlistStore();
 const router = useRouter();
 const route = useRoute();
+const authScreen = computed(() => ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/check-email'].includes(route.path));
 const assistant = useAssistantStore();
 const logoutError = ref('');
 const reconnecting = ref(false);
 const starting = computed(() => !route.matched.length && Boolean(auth.restorePromise));
 const workspace = computed(
-  () => auth.authenticated || Boolean(route.meta.protected && auth.sessionError)
+  () => auth.verified || Boolean(route.meta.protected && auth.sessionError && !auth.authenticated)
 );
 const navigation = [
   { to: '/dashboard', label: 'Overview', mobile: 'Home', icon: PhHouse },
@@ -46,7 +48,7 @@ const currentPage = computed(
 const mobileNavigation = navigation.slice(0, 4);
 const moreNavigation = navigation.slice(4);
 watch(
-  () => auth.user?.id,
+  () => auth.verified ? auth.user?.id : undefined,
   (next, previous) => {
     if (next !== previous) watchlist.$reset();
     if (previous && next !== previous) assistant.$reset();
@@ -81,7 +83,7 @@ async function reconnect() {
   <QLayout class="anitrack-layout" :class="{ 'workspace-mode': workspace, 'collections-mode': route.path.startsWith('/collections') }">
     <a href="#page-content" class="skip-link">Skip to content</a>
     <main v-if="starting" class="startup-state" role="status" aria-label="Opening AniTrack">
-      <span class="logo-icon" aria-hidden="true">⛩️</span>
+      <span class="logo-icon" aria-hidden="true"><BrandMark /></span>
       <h1>AniTrack</h1>
       <div class="startup-progress" />
       <p>Opening your next chapter…</p>
@@ -89,7 +91,7 @@ async function reconnect() {
     <template v-else-if="workspace">
       <aside class="workspace-sidebar">
         <RouterLink to="/dashboard" class="workspace-brand" aria-label="AniTrack overview"
-          ><span class="logo-icon" aria-hidden="true">⛩️</span
+          ><span class="logo-icon" aria-hidden="true"><BrandMark /></span
           ><span class="wordmark">AniTrack</span></RouterLink
         >
         <p class="sidebar-caption">YOUR SPACE</p>
@@ -129,7 +131,7 @@ async function reconnect() {
       </aside>
       <header class="workspace-topbar">
         <RouterLink to="/dashboard" class="workspace-mobile-brand" aria-label="AniTrack overview"
-          ><span class="logo-icon" aria-hidden="true">⛩️</span
+          ><span class="logo-icon" aria-hidden="true"><BrandMark /></span
           ><span class="wordmark">AniTrack</span></RouterLink
         ><span class="workspace-breadcrumb"
           >Your space <span>/</span> <strong>{{ currentPage }}</strong></span
@@ -164,24 +166,25 @@ async function reconnect() {
       <header class="site-header app-header">
         <div class="container header-content">
           <RouterLink to="/" class="logo-area" aria-label="AniTrack home"
-            ><span class="logo-icon" aria-hidden="true">⛩️</span
+            ><span class="logo-icon" aria-hidden="true"><BrandMark /></span
             ><span class="wordmark">AniTrack</span></RouterLink
           >
-          <nav class="main-nav" aria-label="Main navigation">
+          <nav v-if="!auth.authenticated && !authScreen" class="main-nav" aria-label="Main navigation">
             <RouterLink to="/#features">Features</RouterLink
             ><RouterLink to="/#discover">Discover</RouterLink
             ><RouterLink to="/#assistant">Anime Assistant</RouterLink>
           </nav>
-          <div class="header-actions">
-            <RouterLink to="/login" class="login-link">Log in</RouterLink
-            ><RouterLink to="/register" class="btn btn-primary-action"
-              >Get started <PhArrowUpRight :size="17"
-            /></RouterLink>
+          <div v-if="!authScreen || auth.authenticated" class="header-actions" :class="{ 'verification-header-actions': auth.authenticated }">
+            <button v-if="auth.authenticated" class="verification-signout" :disabled="auth.loading" @click="logout">Log out</button>
+            <template v-else><RouterLink to="/login" class="login-link">Log in</RouterLink
+            ><RouterLink to="/register" class="btn btn-primary-action signup-link"
+              >Sign up <PhArrowUpRight :size="17"
+            /></RouterLink></template>
           </div>
         </div>
       </header>
       <nav
-        v-if="!['/login', '/register'].includes(route.path)"
+        v-if="!['/login', '/register', '/check-email', '/verify-email', '/forgot-password', '/reset-password'].includes(route.path)"
         class="mobile-app-nav"
         aria-label="Explore AniTrack"
       >
@@ -209,13 +212,13 @@ async function reconnect() {
             }}</button
           ><RouterLink to="/">About AniTrack</RouterLink>
         </section>
-        <RouterView v-else /></div
+        <RouterView v-else-if="!route.meta.protected || auth.verified || (route.meta.allowUnverified && auth.authenticated)" /></div
     ></QPageContainer>
-    <footer v-if="!workspace && !starting" class="app-footer container">
+    <footer v-if="!workspace && !starting && !authScreen" class="app-footer container">
       <RouterLink to="/" class="footer-wordmark">AniTrack</RouterLink>
       <p>Your anime journey, in one place.</p>
-      <RouterLink to="/#features">Explore AniTrack <PhArrowUpRight :size="16" /></RouterLink
-      ><span>© {{ new Date().getFullYear() }} AniTrack</span>
+      <RouterLink v-if="!auth.authenticated" to="/#features">Explore AniTrack <PhArrowUpRight :size="16" /></RouterLink>
+      <span>© {{ new Date().getFullYear() }} AniTrack</span>
     </footer>
   </QLayout>
 </template>

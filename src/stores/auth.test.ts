@@ -13,6 +13,16 @@ beforeEach(() => {
 });
 afterEach(() => vi.restoreAllMocks());
 describe('Session recovery state', () => {
+  it('distinguishes an unverified signed-in account from workspace access', () => {
+    const store = useAuthStore();
+    store.user = { id: 'pending', name: 'Pending member', email: 'pending@example.test', role: 'MEMBER', emailVerifiedAt: null };
+    expect(store.authenticated).toBe(true);
+    expect(store.verified).toBe(false);
+    store.user.emailVerifiedAt = '2026-11-02T00:00:00.000Z';
+    expect(store.verified).toBe(true);
+    store.clear();
+    expect(store.verified).toBe(false);
+  });
   it('leaves a failed restore retryable rather than treating a temporary outage as signed out', async () => {
     mocks.refresh.mockRejectedValueOnce(new ApiError(503, 'SERVICE_UNAVAILABLE', 'Unavailable'));
     const store = useAuthStore();

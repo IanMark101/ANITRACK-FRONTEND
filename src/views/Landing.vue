@@ -90,8 +90,7 @@ onBeforeUnmount(() => {
   <main ref="page" class="landing-page">
     <section class="landing-hero container">
       <div class="hero-copy">
-        <p class="hero-eyebrow">A home for your anime journey</p>
-        <h1>Your anime.<br /><span>Your next chapter.</span></h1>
+        <h1>Your anime.<br />Your next chapter.</h1>
         <p class="hero-description">
           Keep the stories you love close. Track your watches, rate your favorites, and find what
           comes next.
@@ -147,14 +146,14 @@ onBeforeUnmount(() => {
 
     <section id="features" class="landing-section container">
       <div class="section-intro">
-        <h2>A little less searching.<br /><span>A lot more watching.</span></h2>
+        <h2>Track every chapter.</h2>
         <p>One personal collection, built around how you watch.</p>
       </div>
       <div class="feature-grid">
         <article class="feature-tile feature-watch">
           <div class="feature-copy">
             <PhBookmarkSimple :size="30" />
-            <h3>Every title has its place.</h3>
+            <h3>Your watchlist.</h3>
             <p>Watching, completed, or saved for later. Keep your next adventure within reach.</p>
           </div>
           <img
@@ -173,7 +172,6 @@ onBeforeUnmount(() => {
           <PhStar :size="36" weight="fill" />
           <h3>Your taste.<br />Your rating.</h3>
           <p>Give each story a personal score. Find your favorites at a glance.</p>
-          <span class="rating-type" aria-hidden="true">★</span>
         </article>
         <article class="feature-tile feature-favorite">
           <div class="favorite-visual">
@@ -186,7 +184,7 @@ onBeforeUnmount(() => {
             /><PhHeart :size="52" weight="fill" />
           </div>
           <div class="feature-copy">
-            <h3>Keep the good ones close.</h3>
+            <h3>Your favorites.</h3>
             <p>A heart for the stories you’ll always come back to.</p>
           </div>
         </article>
@@ -199,7 +197,7 @@ onBeforeUnmount(() => {
             height="779"
           />
           <div class="feature-copy">
-            <h3>Put your favorite in the spotlight.</h3>
+            <h3>Your spotlight.</h3>
             <p>Make your dashboard yours, with a featured title you choose.</p>
           </div>
         </article>
@@ -255,10 +253,7 @@ onBeforeUnmount(() => {
         height="900"
       />
       <h2>
-        Great stories deserve
-        <span class="inline-poster" aria-hidden="true"
-          ><img src="/images/editorial/ponyo.webp" alt="" loading="lazy" width="120" height="65" /></span
-        ><br /><span>a place in yours.</span>
+        Your next story.<br /><span>Starts here.</span>
       </h2>
       <RouterLink :to="destination" class="btn btn-primary-action large-button"
         >{{ auth.authenticated ? 'Go to dashboard' : 'Create your account' }}
@@ -288,18 +283,6 @@ onBeforeUnmount(() => {
   z-index: 2;
   width: 100%;
   max-width: 900px;
-  pointer-events: none;
-}
-.hero-copy a {
-  pointer-events: auto;
-}
-.hero-eyebrow {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2.3px;
-  text-transform: uppercase;
-  color: #c1b5b7;
-  margin-bottom: 26px;
 }
 .hero-copy h1 {
   font-family: Outfit, sans-serif;
@@ -308,9 +291,6 @@ onBeforeUnmount(() => {
   letter-spacing: -3.2px;
   font-weight: 600;
   max-width: 900px;
-}
-.hero-copy h1 span {
-  color: #f3b3b8;
 }
 .hero-description {
   font-size: 15px;
@@ -373,18 +353,20 @@ onBeforeUnmount(() => {
   margin-top: 70px;
 }
 .genre-strip {
-  border-block: 1px solid #29292e;
-  padding: 29px 0;
-  overflow: hidden;
+  padding: 29px 20px;
   color: #8d8d99;
 }
 .genre-track {
   display: flex;
-  gap: 50px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px 32px;
   align-items: center;
-  width: max-content;
   font-family: Outfit, sans-serif;
   font-size: 24px;
+}
+.genre-track [aria-hidden='true'] {
+  display: none;
 }
 .genre-track svg {
   color: #723d43;
@@ -421,7 +403,6 @@ onBeforeUnmount(() => {
 }
 .feature-tile {
   position: relative;
-  border: 1px solid #303038;
   background: #1a1a1f;
   border-radius: 16px;
   overflow: hidden;
@@ -481,36 +462,23 @@ onBeforeUnmount(() => {
   padding: 9px 12px;
   border: 1px solid #454550;
   border-radius: 7px;
-  font-size: 10px;
+  font-size: 13px;
   background: #17171ed9;
 }
 .feature-rating {
   grid-column: span 5;
-  background: radial-gradient(ellipse at bottom right, #4a2028, transparent 75%), #1a1a1f;
+  background: #241d21;
 }
 .feature-rating > svg {
   color: #f3b3b8;
 }
-.rating-type {
-  position: absolute;
-  right: 16px;
-  bottom: -55px;
-  font-size: 210px;
-  line-height: 1;
-  color: #f3b3b80c;
-  transform: rotate(-15deg);
-  pointer-events: none;
-}
 .feature-favorite {
   grid-column: span 5;
-  padding-top: 190px;
 }
 .favorite-visual {
-  position: absolute;
-  top: 26px;
-  left: 35px;
-  right: 35px;
+  position: relative;
   height: 155px;
+  margin-bottom: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -525,7 +493,6 @@ onBeforeUnmount(() => {
 .favorite-visual svg {
   color: #e50914;
   margin-left: 28px;
-  filter: drop-shadow(0 7px 12px #5b1618);
 }
 .feature-spotlight {
   grid-column: span 7;
@@ -624,22 +591,6 @@ onBeforeUnmount(() => {
 .landing-cta h2 span {
   color: #f3b3b8;
 }
-.inline-poster {
-  display: inline-block;
-  width: 110px;
-  height: 65px;
-  overflow: hidden;
-  border-radius: 50px;
-  transform: rotate(-7deg);
-  vertical-align: middle;
-  margin-left: 10px;
-}
-.inline-poster img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-}
 .landing-cta .btn {
   margin: auto;
 }
@@ -648,7 +599,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   color: #e4e4eb;
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: none;
   font-weight: 600;
   white-space: nowrap;
@@ -666,19 +617,6 @@ onBeforeUnmount(() => {
 }
 .landing-page .btn-primary-action:hover {
   transform: translateY(-2px);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .genre-track {
-    animation: genres-drift 45s linear infinite;
-  }
-  .genre-strip:hover .genre-track {
-    animation-play-state: paused;
-  }
-  @keyframes genres-drift {
-    to {
-      transform: translateX(-440px);
-    }
-  }
 }
 @media (min-width: 1550px) {
   .landing-hero {
@@ -699,11 +637,12 @@ onBeforeUnmount(() => {
     left: 35%;
     opacity: 0.45;
   }
-  .feature-tile {
-    padding: 28px;
+  .feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .feature-favorite {
-    padding-top: 190px;
+  .feature-tile {
+    grid-column: auto;
+    padding: 28px;
   }
   .feature-watch .feature-copy {
     max-width: 220px;
@@ -723,66 +662,84 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 767px) {
   .landing-hero {
-    display: block;
-    padding-top: 64px;
-    padding-bottom: 0;
-    min-height: 720px;
+    display: flex;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    min-height: min(580px, calc(100svh - 108px));
+    overflow: hidden;
   }
   .hero-copy h1 {
-    font-size: clamp(36px, 7.4vw, 56px);
-    letter-spacing: -1.7px;
-  }
-  .hero-eyebrow {
-    font-size: 10px;
-    letter-spacing: 1.6px;
-    margin-bottom: 23px;
+    font-size: clamp(32px, 9vw, 40px);
+    letter-spacing: -1.2px;
   }
   .hero-description {
-    font-size: 13px;
-    max-width: 320px;
-    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.75;
+    max-width: 36ch;
+    margin-top: 16px;
   }
   .landing-actions {
-    gap: 18px;
-    flex-wrap: wrap;
-    margin-top: 25px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 24px;
   }
   .large-button {
-    padding: 13px 16px;
-    font-size: 12px;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 14px;
   }
   .text-action {
-    font-size: 11px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .landing-actions .text-action {
+    justify-content: center;
   }
   .hero-art {
-    inset: 310px -40px 0 -10px;
-    transform: rotate(-8deg);
-    opacity: 0.6;
+    /* The posters remain one backdrop inside the hero, with copy above the scrim. */
+    position: absolute;
+    inset: -30px -60px -30px 20%;
+    height: auto;
+    margin: 0;
+    transform: rotate(-10deg);
+    opacity: .55;
     gap: 10px;
-    mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 75%, transparent);
+    mask-image: none;
+    border-radius: 0;
+  }
+  .hero-art::after {
+    display: block;
+    /* taste-skill-ignore: gradient -- neutral scrim over real cover art for legibility. */
+    background: linear-gradient(90deg, #101012f5, #101012bd 38%, #10101266 100%);
   }
   .hero-art-column {
     gap: 10px;
   }
   .hero-art-column img {
-    height: 210px;
+    height: 240px;
+    aspect-ratio: auto;
     border-radius: 8px;
   }
   .art-column-one {
-    margin-top: 40px;
+    margin-top: -70px;
   }
   .art-column-two {
-    margin-top: 0;
+    margin-top: 15px;
   }
   .art-column-three {
-    margin-top: 70px;
+    margin-top: -45px;
   }
   .genre-strip {
-    padding: 20px 0;
+    padding: 20px;
   }
   .genre-track {
     font-size: 20px;
-    gap: 30px;
+    gap: 16px 20px;
+  }
+  .genre-track svg {
+    display: none;
   }
   .landing-section {
     padding-top: 85px;
@@ -796,7 +753,7 @@ onBeforeUnmount(() => {
     letter-spacing: -1px;
   }
   .section-intro p {
-    font-size: 12px;
+    font-size: 14px;
     max-width: 290px;
     line-height: 1.8;
   }
@@ -816,9 +773,6 @@ onBeforeUnmount(() => {
   }
   .feature-tile h3 {
     font-size: 25px;
-  }
-  .feature-favorite {
-    padding-top: 180px;
   }
   .feature-spotlight {
     min-height: 320px;
@@ -844,9 +798,6 @@ onBeforeUnmount(() => {
   }
   .landing-cta h2 {
     font-size: 36px;
-  }
-  .inline-poster {
-    display: none;
   }
 }
 </style>

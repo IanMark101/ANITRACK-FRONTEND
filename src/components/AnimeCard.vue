@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PhPlus, PhCheck, PhArrowUpRight } from '@phosphor-icons/vue';
+import { PhPlus, PhCheck, PhArrowUpRight, PhStar } from '@phosphor-icons/vue';
 import type { RemoteAnime } from '../types';
 defineProps<{ anime: RemoteAnime; added?: boolean; busy?: boolean }>();
 defineEmits<{ add: [anime: RemoteAnime] }>();
@@ -25,7 +25,7 @@ function fallback(event: Event) {
     </RouterLink>
     <div class="explore-card-meta">
       <span>{{ anime.format || 'Anime' }}{{ anime.year ? ` · ${anime.year}` : '' }}</span
-      ><span v-if="anime.communityScore">★ {{ anime.communityScore.toFixed(1) }}</span>
+      ><span v-if="anime.communityScore" :aria-label="`Community score ${anime.communityScore.toFixed(1)} out of 10`"><PhStar :size="12" weight="fill" aria-hidden="true" /> {{ anime.communityScore.toFixed(1) }}</span>
     </div>
     <small v-if="anime.relation" class="explore-relation">{{ anime.relation }}</small>
     <h3>

@@ -589,14 +589,12 @@
   margin-top: 37px;
 }
 .assistant-callout-icon {
-  width: 48px;
-  height: 48px;
+  width: 28px;
+  height: 28px;
   flex: none;
   display: grid;
   place-items: center;
-  background: #3e2633;
-  color: #ffb7c1;
-  border-radius: 12px;
+  color: #c5c5cf;
 }
 .overview-assistant h2 {
   font:
@@ -808,12 +806,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 22px;
-  border-bottom: 1px solid #292d39;
   margin-bottom: 20px;
 }
 .watchlist-tabs button {
   position: relative;
-  padding: 0 0 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
   border: 0;
   background: none;
   color: #8c95ab;
@@ -821,19 +819,12 @@
   align-items: center;
   gap: 9px;
   font-size: 12px;
-  min-height: 40px;
+  min-height: 44px;
   cursor: pointer;
 }
 .watchlist-tabs button.active {
   color: #f0f0f8;
-}
-.watchlist-tabs button.active::after {
-  content: '';
-  height: 2px;
-  background: #f13c51;
-  position: absolute;
-  bottom: -1px;
-  inset-inline: 0;
+  background: #25252c;
 }
 .watchlist-tabs button > span {
   font-size: 11px;
@@ -847,6 +838,7 @@
   align-items: center;
   gap: 12px;
 }
+.watchlist-search-row { display: flex; align-items: center; flex: 1; min-width: 0; gap: 8px; }
 .library-search {
   display: flex;
   align-items: center;
@@ -1005,7 +997,7 @@
   background: none;
   border: 0;
   font-size: inherit;
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
 }
 .inline-error {
@@ -1355,9 +1347,9 @@
 .upload-cover {
   position: relative;
   cursor: pointer;
-  min-height: 36px !important;
-  font-size: 11px !important;
-  padding: 8px 11px !important;
+  min-height: 44px;
+  font-size: 14px;
+  padding: 10px 12px;
 }
 .upload-cover input {
   position: absolute;
@@ -1371,7 +1363,8 @@
   margin-top: 20px;
 }
 .preset-covers summary {
-  font-size: 11px;
+  font-size: 12px;
+  min-height: 44px;
   color: #a3b1cb;
   padding: 7px 0;
   cursor: pointer;
@@ -1893,10 +1886,28 @@
 }
 .account-page { max-width: 900px; }
 .account-panel { padding: clamp(20px, 4vw, 32px); margin-bottom: 24px; background: #18181d; border: 1px solid #303038; border-radius: 18px; }
-.account-panel h1, .account-panel h2 { margin: 0 0 16px; }
+.account-panel h1, .account-panel h2 { margin: 0 0 16px; font-family: Outfit, sans-serif; font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+.account-panel h2 { font-size: 22px; }
 .account-panel p { margin: 12px 0 20px; line-height: 1.6; color: #c5c5cf; }
 .account-form { display: grid; gap: 18px; max-width: 520px; margin: 20px 0; }
 .account-form label { display: grid; gap: 8px; font-weight: 600; }
 .account-form input { padding: 12px 14px; width: 100%; min-width: 0; border: 1px solid #4b4b58; border-radius: 10px; background: #101014; color: #fff; font: inherit; }
 .account-form input:focus-visible { outline: 2px solid #f35b63; outline-offset: 3px; }
-.account-link-page { max-width: 640px; padding-top: 60px; padding-bottom: 60px; }
+.account-link-page { max-width: 600px; padding-top: 40px; padding-bottom: 40px; }
+.account-link-page h1 { font-size: 32px; }
+.account-link-page .account-panel { margin-bottom: 0; }
+.account-link-page .account-form { gap: 20px; }
+.account-link-page .account-form .btn { min-height: 48px; }
+.account-link-page .btn-primary-action { box-shadow: none; }
+.account-link-page .text-action { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+@media (max-width: 767px) {
+  .account-link-page { padding-top: 24px; padding-bottom: 32px; }
+  .account-link-page .account-panel { padding: 22px 20px; border-radius: 12px; }
+  .account-link-page h1 { font-size: 22px; margin-bottom: 12px; }
+  .account-link-page p { font-size: 14px; margin: 0 0 20px; line-height: 1.6; }
+  .account-link-page .account-form { margin: 20px 0 12px; gap: 20px; }
+  .account-link-page .account-form label { font-size: 13px; gap: 8px; }
+  .account-link-page .account-form input { min-height: 48px; font-size: 16px; }
+  .account-link-page .account-form .btn { font-size: 14px; }
+  .account-panel h2 { font-size: 20px; }
+}

@@ -86,6 +86,13 @@ function fallback(event: Event) {
       >
         <PhHeart :size="20" :weight="entry.isFavorite ? 'fill' : 'regular'" />
       </button>
+      <button class="icon-button card-menu-button cover-menu" :aria-label="`More options for ${entry.title}`">
+        <PhDotsThree :size="22" /><QMenu class="library-menu" auto-close
+          ><button @click="progressOpen = true">Edit episode progress</button
+          ><button @click="rating = entry.rating; ratingOpen = true">Edit rating</button
+          ><button :disabled="store.busy" @click="spotlight"><PhStarFour :size="17" />Feature on overview</button
+          ><button :disabled="store.busy" class="danger-text" @click="removeOpen = true"><PhTrash :size="17" />Remove from watchlist</button></QMenu>
+      </button>
     </div>
     <div class="library-card-meta">
       <span>{{ entry.genre }}</span
@@ -110,23 +117,7 @@ function fallback(event: Event) {
         @change="update({ status: ($event.target as HTMLSelectElement).value as WatchStatus })"
       >
         <option v-for="status in statuses" :key="status">{{ status }}</option></select
-      ><button class="icon-button card-menu-button" :aria-label="`More options for ${entry.title}`">
-        <PhDotsThree :size="22" /><QMenu class="library-menu" auto-close
-          ><button @click="progressOpen = true">Edit episode progress</button
-          ><button
-            @click="
-              rating = entry.rating;
-              ratingOpen = true;
-            "
-          >
-            Edit rating</button
-          ><button :disabled="store.busy" @click="spotlight">
-            <PhStarFour :size="17" />Feature on overview</button
-          ><button :disabled="store.busy" class="danger-text" @click="removeOpen = true">
-            <PhTrash :size="17" />Remove from watchlist
-          </button></QMenu
-        >
-      </button>
+      >
     </div>
     <WatchProgress v-if="progress" :entry="entry" compact />
     <p v-if="error" class="inline-error" role="alert">{{ error }}</p>
@@ -218,3 +209,19 @@ function fallback(event: Event) {
     >
   </article>
 </template>
+
+<style scoped>
+.library-cover .cover-menu {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  background: #16161bdb;
+  color: #fff;
+}
+.library-cover .cover-menu:hover { background: #292930; }
+</style>

@@ -1427,7 +1427,7 @@ body {
 }
 
 .ref-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
   color: #93c5fd;
 }
 

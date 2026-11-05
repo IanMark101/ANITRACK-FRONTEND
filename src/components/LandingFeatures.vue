@@ -32,7 +32,7 @@ import { PhArrowRight } from '@phosphor-icons/vue';
 .member-feature-story h2 { font: 600 clamp(34px, 4vw, 56px)/1.1 Outfit, sans-serif; letter-spacing: -.035em; margin: 0 0 24px; color: #f5f5f5; }
 .member-feature-story p { font: 400 16px/1.75 'Plus Jakarta Sans', sans-serif; max-width: 58ch; color: #c7c7c7; margin: 0 0 18px; }
 .member-feature-story .member-feature-access { color: #f1f1f1; }
-.member-feature-action { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding-block: 10px; color: #fff; font: 600 15px/1.5 'Plus Jakarta Sans', sans-serif; text-decoration: underline; text-underline-offset: 5px; }
+.member-feature-action { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding-block: 10px; color: #fff; font: 600 15px/1.5 'Plus Jakarta Sans', sans-serif; text-decoration: none; }
 .member-feature-action:hover { color: #f3b3b8; }
 .member-feature-action:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 .member-feature-story > img { display: block; width: 100%; height: auto; aspect-ratio: 10 / 7; object-fit: cover; border-radius: 8px; }

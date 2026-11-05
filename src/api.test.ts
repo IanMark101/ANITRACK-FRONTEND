@@ -1,6 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('API authentication refresh', () => {
+  it('maps a normal empty guest response to signed-out state without parsing a session', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { refreshSession, observeSession, setAccessToken } = await import('./api');
+    setAccessToken('stale-token');
+    const observed = vi.fn();
+    observeSession(observed);
+    await expect(refreshSession()).rejects.toMatchObject({ status: 401, code: 'UNAUTHENTICATED' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(observed).toHaveBeenCalledWith(null);
+  });
+
   it('cannot restore an old session after explicit sign-out', async () => {
     let finish!: (response: Response) => void;
     vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise((resolve) => { finish = resolve; })));

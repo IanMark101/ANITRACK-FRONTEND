@@ -68,7 +68,7 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
 export function refreshSession(): Promise<Session> {
   if (!refreshPromise) {
     const version = identityVersion;
-    const refresh = () => send<Session>('/auth/refresh', { method: 'POST' });
+    const refresh = () => send<Session | undefined>('/auth/refresh', { method: 'POST' });
     // Browser tabs share the rotating cookie; serialize refreshes across tabs too.
     const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
     const pending = Promise.resolve(
@@ -76,6 +76,7 @@ export function refreshSession(): Promise<Session> {
     )
       .then((session) => {
         if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');
+        if (!session) throw new ApiError(401, 'UNAUTHENTICATED', 'Please sign in.');
         setAccessToken(session.accessToken);
         onSession(session);
         return session;

@@ -149,8 +149,7 @@
   font-size: 11px;
   cursor: pointer;
   min-height: 32px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  text-decoration: none;
 }
 .assistant-privacy {
   margin-top: 22px;
@@ -448,12 +447,15 @@
   .mobile-app-nav {
     display: flex;
     gap: 24px;
-    padding: 12px 20px;
+    padding: 0 20px;
+    flex-wrap: wrap;
     background: #18181c;
-    border-bottom: 1px solid #303039;
   }
   .mobile-app-nav a {
-    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 13px;
     color: #bdbdca;
     text-decoration: none;
     line-height: 1.8;

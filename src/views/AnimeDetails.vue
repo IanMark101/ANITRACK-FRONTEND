@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { PhArrowLeft, PhArrowUpRight, PhPlay, PhPlus, PhCheck } from '@phosphor-icons/vue';
+import { QDialog } from 'quasar';
+import { PhArrowLeft, PhArrowUpRight, PhPlay, PhPlus, PhCheck, PhX } from '@phosphor-icons/vue';
 import { api } from '../api';
 import { useAuthStore } from '../stores/auth';
 import { useWatchlistStore } from '../stores/watchlist';
@@ -26,6 +27,7 @@ const related = ref<RemoteAnime[]>([]);
 const explanation = ref('');
 const episodePage = ref(1);
 const playTrailer = ref(false);
+const trailerLoading = ref(true);
 const entry = computed(() =>
   store.items.find(
     (entry) => entry.provider === 'KITSU' && entry.externalId === item.value?.externalId
@@ -174,26 +176,24 @@ onBeforeUnmount(() => {
             {{ item.airingStatus.replaceAll('_', ' ') }}
           </div>
           <h1>{{ item.title }}</h1>
-          <p v-if="item.alternativeTitles.length" class="anime-alternative">
-            {{ item.alternativeTitles.slice(0, 3).join(' · ') }}
-          </p>
-          <div class="anime-genre-list">
-            <span v-for="genre in item.genres.slice(0, 8)" :key="genre">{{ genre }}</span>
-          </div>
+          <details v-if="item.alternativeTitles.length" class="anime-alternative">
+            <summary>Other titles</summary>
+            <p>{{ item.alternativeTitles.slice(0, 3).join(' · ') }}</p>
+          </details>
           <div class="anime-detail-actions">
+            <RouterLink v-if="entry" to="/watchlist" class="btn btn-primary-action"><PhCheck :size="18" />Open watchlist</RouterLink>
             <button
+              v-else
               class="btn btn-primary-action"
-              :disabled="store.busy || !!entry"
+              :disabled="store.busy"
               @click="add(item)"
             >
-              <component :is="entry ? PhCheck : PhPlus" :size="18" />{{
-                entry ? 'In your watchlist' : 'Add to watchlist'
-              }}</button
-            ><RouterLink v-if="entry" to="/watchlist" class="btn btn-glass"
-              >Open collection</RouterLink
-            ><a :href="item.sourceUrl" target="_blank" rel="noopener noreferrer" class="text-action"
-              >View on Kitsu <PhArrowUpRight :size="16"
-            /></a>
+              <PhPlus :size="18" />Add to watchlist</button>
+            <button v-if="item.trailerId" class="btn btn-glass" @click="trailerLoading = true; playTrailer = true"><PhPlay :size="18" />Watch trailer</button>
+            <span v-else class="explore-muted">Trailer not provided.</span>
+          </div>
+          <div class="anime-genre-list">
+            <span v-for="genre in item.genres.slice(0, 8)" :key="genre">{{ genre }}</span>
           </div>
           <dl class="anime-facts">
             <div>
@@ -243,19 +243,6 @@ onBeforeUnmount(() => {
       <section v-if="active === 'overview'" class="anime-overview">
         <h2>The story</h2>
         <p class="anime-synopsis">{{ item.synopsis || 'A synopsis has not been provided yet.' }}</p>
-        <div v-if="item.trailerId" class="anime-trailer">
-          <h2>Trailer</h2>
-          <button v-if="!playTrailer" class="btn btn-glass" @click="playTrailer = true">
-            <PhPlay :size="18" /> Play trailer</button
-          ><iframe
-            v-else
-            :src="`https://www.youtube-nocookie.com/embed/${item.trailerId}`"
-            :title="`${item.title} trailer`"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
-        </div>
-        <p v-else class="explore-muted">No trailer is available for this title.</p>
       </section>
       <div v-else-if="extraLoading" class="explore-state" role="status">
         Loading {{ active === 'episodes' ? 'episodes' : 'anime' }}…
@@ -315,7 +302,28 @@ onBeforeUnmount(() => {
       </section>
       <p class="explore-attribution">
         Anime information from Kitsu. Community scores are separate from your personal rating.
+        <a :href="item.sourceUrl" target="_blank" rel="noopener noreferrer" class="text-action anime-source-link">View on Kitsu <PhArrowUpRight :size="16" /></a>
       </p>
+      <QDialog v-model="playTrailer">
+        <section class="app-dialog trailer-dialog" aria-labelledby="trailer-heading">
+          <header>
+            <div><h2 id="trailer-heading">Watch trailer</h2><p>{{ item.title }}</p></div>
+            <button class="icon-button" aria-label="Close trailer" @click="playTrailer = false"><PhX :size="22" /></button>
+          </header>
+          <p v-if="trailerLoading" class="trailer-loading" role="status">Loading trailer…</p>
+          <iframe
+            v-if="playTrailer && item.trailerId"
+            class="trailer-player"
+            :src="`https://www.youtube-nocookie.com/embed/${item.trailerId}`"
+            :title="`${item.title} trailer`"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            referrerpolicy="strict-origin-when-cross-origin"
+            @load="trailerLoading = false"
+            allowfullscreen
+          ></iframe>
+          <a v-if="item.trailerId" :href="`https://www.youtube.com/watch?v=${item.trailerId}`" target="_blank" rel="noopener noreferrer" class="trailer-source">Open on YouTube <PhArrowUpRight :size="18" /></a>
+        </section>
+      </QDialog>
     </template>
   </main>
 </template>

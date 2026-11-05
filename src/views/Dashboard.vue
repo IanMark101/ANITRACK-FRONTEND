@@ -6,7 +6,8 @@ import {
   PhArrowLeft,
   PhBooks,
   PhSparkle,
-  PhArrowClockwise
+  PhArrowClockwise,
+  PhStar
 } from '@phosphor-icons/vue';
 import { useAuthStore } from '../stores/auth';
 import { useWatchlistStore } from '../stores/watchlist';
@@ -94,8 +95,8 @@ onBeforeUnmount(() => {
         <h1>Your next chapter.</h1>
         <p>Welcome back, {{ firstName }}. A world of stories is waiting.</p>
       </div>
-      <button class="btn btn-primary-action" @click="addOpen = true">
-        <PhPlus :size="19" />Add anime
+      <button class="btn btn-primary-action page-add-action" aria-label="Add anime" @click="addOpen = true">
+        <PhPlus :size="19" /><span>Add anime</span>
       </button>
     </header>
     <p v-if="notice" class="app-feedback success-feedback" role="status">{{ notice }}</p>
@@ -130,6 +131,7 @@ onBeforeUnmount(() => {
           :src="featured?.image || '/images/editorial/howls-moving-castle.webp'"
           :alt="featured ? `${featured.title} artwork` : 'Howl’s moving castle among the clouds'"
           class="feature-art"
+          @error="(event) => { const image = event.target as HTMLImageElement; if (!image.src.endsWith('/images/editorial/howls-moving-castle.webp')) { image.src = '/images/editorial/howls-moving-castle.webp'; image.alt = 'Anime landscape'; } }"
         />
         <div class="feature-shade" />
         <div class="feature-copy">
@@ -140,7 +142,7 @@ onBeforeUnmount(() => {
           <div v-if="featured" class="feature-meta">
             <span>{{ featured.genre }}</span
             ><span>{{ featured.status }}</span
-            ><span>★ {{ featured.rating.toFixed(1) }}</span>
+            ><span :aria-label="`Your rating ${featured.rating.toFixed(1)} out of 10`"><PhStar :size="12" weight="fill" aria-hidden="true" /> {{ featured.rating.toFixed(1) }}</span>
           </div>
           <p>
             {{

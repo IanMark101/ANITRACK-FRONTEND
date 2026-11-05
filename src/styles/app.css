@@ -20,6 +20,7 @@ body.capacitor .app-header {
 }
 a {
   color: inherit;
+  text-decoration: none;
 }
 button,
 input,
@@ -46,6 +47,15 @@ textarea:focus-visible {
   font-weight: 700;
   color: #f5f5f8;
 }
+.logo-icon {
+  background: none;
+  box-shadow: none;
+}
+.brand-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .app-header {
   height: 76px;
   padding: 0;
@@ -53,6 +63,10 @@ textarea:focus-visible {
   align-items: center;
   position: sticky;
   box-shadow: none;
+  background: var(--bg-body);
+  border-bottom: 0;
+  backdrop-filter: none; /* taste-skill-ignore: glass -- removes inherited header blur. */
+  -webkit-backdrop-filter: none;
 }
 .app-header .container {
   width: 100%;
@@ -65,7 +79,8 @@ textarea:focus-visible {
   box-shadow: none;
 }
 .app-header .btn {
-  font-size: 11px;
+  min-height: 44px;
+  font-size: 13px;
   padding: 10px 15px;
   box-shadow: none;
   gap: 10px;
@@ -75,7 +90,10 @@ textarea:focus-visible {
   gap: 32px;
 }
 .main-nav a {
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
   text-decoration: none;
   color: #b9b9c3;
 }
@@ -84,7 +102,10 @@ textarea:focus-visible {
   color: #f5f5f8;
 }
 .login-link {
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 13px;
   text-decoration: none;
   color: #dddde5;
   margin-right: 12px;
@@ -110,7 +131,6 @@ textarea:focus-visible {
   gap: 35px;
   padding-top: 36px;
   padding-bottom: 36px;
-  border-top: 1px solid #29292f;
   max-width: 1256px;
 }
 .footer-wordmark {
@@ -120,7 +140,7 @@ textarea:focus-visible {
   font-weight: 600;
 }
 .app-footer p {
-  font-size: 11px;
+  font-size: 13px;
   color: #aaaab7;
   flex: 1;
 }
@@ -129,11 +149,11 @@ textarea:focus-visible {
   gap: 7px;
   align-items: center;
   text-decoration: none;
-  font-size: 11px;
+  font-size: 13px;
   color: #c5c5ce;
 }
 .app-footer > span {
-  font-size: 10px;
+  font-size: 13px;
   color: #9696a3;
 }
 .skip-link {
@@ -234,7 +254,7 @@ textarea:focus-visible {
   gap: 24px;
 }
 .auth-form-wrap .form-label {
-  font-size: 11px;
+  font-size: 13px;
   color: #dedee7;
 }
 .auth-form-wrap .form-input {
@@ -244,6 +264,136 @@ textarea:focus-visible {
 .auth-form-wrap small {
   font-size: 10px;
   color: #aaaab8;
+}
+.auth-password-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  column-gap: 16px;
+}
+.auth-recovery-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #b5b5c3;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: color 150ms ease-out;
+}
+.auth-recovery-link:hover,
+.auth-recovery-link:focus-visible {
+  color: #fff;
+}
+.auth-recovery-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.auth-recovery-link:active {
+  color: #f3b3b8;
+}
+.verification-page.container {
+  max-width: 680px;
+  padding-block: clamp(40px, 8vw, 88px);
+}
+.verification-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  padding: clamp(24px, 5vw, 40px);
+  border-radius: 16px;
+  background: #18181d;
+  color: #c5c5cf;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.verification-card h1 {
+  margin: 0;
+  color: #fff;
+  font: 600 clamp(24px, 2.5vw, 32px)/1.2 Outfit, sans-serif;
+  letter-spacing: -0.6px;
+}
+.verification-card p {
+  margin: 0;
+}
+.verification-card .verification-address {
+  margin-top: -12px;
+  color: #fff;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.verification-actions {
+  display: grid;
+  gap: 12px;
+}
+.verification-card button,
+.verification-signout {
+  min-height: 44px;
+  font: inherit;
+}
+.verification-card .btn {
+  justify-content: center;
+  white-space: normal;
+  box-shadow: none; /* taste-skill-ignore: shadow -- explicitly removes inherited button shadows. */
+}
+.verification-secondary,
+.verification-switch,
+.verification-signout {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #dedee7;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: color 150ms ease-out, background-color 150ms ease-out;
+}
+.verification-secondary {
+  background: #292930;
+}
+.verification-switch {
+  align-self: flex-start;
+  margin-left: -14px;
+  text-decoration: none;
+}
+.verification-secondary:hover,
+.verification-switch:hover,
+.verification-signout:hover {
+  background: #35353e;
+  color: #fff;
+}
+.verification-card button:focus-visible,
+.verification-signout:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.verification-card button:disabled {
+  background: #22232b;
+  color: #b5b5c3;
+  opacity: 1 !important;
+  cursor: wait;
+}
+.verification-feedback {
+  padding: 12px 16px;
+  background: #292930;
+  border-radius: 8px;
+  color: #eeeef4;
+}
+.verification-error {
+  background: #35171f;
+  color: #ffd8dc;
+}
+.verification-card .verification-help {
+  color: #b5b5c3;
+  font-size: 13px;
+}
+.header-actions.verification-header-actions {
+  margin-left: auto;
+  width: auto;
+  flex: none;
 }
 .password-field {
   position: relative;
@@ -271,10 +421,15 @@ textarea:focus-visible {
   margin-left: 8px;
 }
 .auth-form-wrap .session-notice {
-  font-size: 11px;
+  font-size: 14px;
   color: #f1bac0;
-  margin-bottom: 20px;
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: #242024;
 }
+.session-notice p { line-height: 1.6; }
+.session-notice button { min-height: 44px; margin-top: 8px; padding: 8px 0; border: 0; background: transparent; color: #fff; font: inherit; cursor: pointer; }
 .state-panel {
   margin: 40px auto;
   padding: 40px;
@@ -390,9 +545,15 @@ textarea:focus-visible {
     padding-inline: 20px;
   }
   .app-header {
-    height: 68px;
+    height: 64px;
+  }
+  body.capacitor .app-header {
+    height: calc(64px + env(safe-area-inset-top, 0px));
   }
   .app-header .logo-area {
+    gap: 8px;
+  }
+  .app-header .header-content {
     gap: 8px;
   }
   .app-header .logo-icon {
@@ -407,16 +568,20 @@ textarea:focus-visible {
     display: none;
   }
   .app-header .btn {
-    padding: 9px 11px;
-    font-size: 10px;
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 13px;
     gap: 6px;
   }
   .header-actions {
     gap: 7px;
   }
   .login-link {
-    margin-right: 6px;
-    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-right: 0;
+    font-size: 13px;
   }
   .app-footer {
     flex-wrap: wrap;

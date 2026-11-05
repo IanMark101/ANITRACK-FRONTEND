@@ -1,7 +1,9 @@
 import { defineConfig } from '#q-app';
 import { Agent } from 'node:http';
+import { loadEnv } from 'vite';
 
 export default defineConfig((ctx) => {
+  const devHost = process.env.ANITRACK_DEV_HOST || loadEnv(ctx.dev ? 'development' : 'production', process.cwd(), 'ANITRACK_').ANITRACK_DEV_HOST;
   if (ctx.mode.capacitor && ctx.prod && !ctx.debug) {
     const api = process.env.VITE_MOBILE_API_URL;
     let url: URL | undefined;
@@ -31,7 +33,7 @@ export default defineConfig((ctx) => {
       }
     },
     devServer: {
-      host: '127.0.0.1',
+      host: devHost || '127.0.0.1',
       port: 5173,
       strictPort: true,
       open: false,

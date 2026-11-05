@@ -89,8 +89,10 @@ async function submit() {
       <p>
         {{ registering ? 'Make room for your next favorite.' : accessMessage }}
       </p>
-      <p v-if="auth.sessionError" class="session-notice">{{ auth.sessionError }}</p>
-      <RouterLink v-if="!registering" to="/forgot-password" class="text-action">Forgot your password?</RouterLink>
+      <div v-if="auth.sessionError" class="session-notice" role="alert">
+        <p>{{ auth.sessionError }}</p>
+        <button type="button" :disabled="Boolean(auth.restorePromise)" @click="auth.restore()">{{ auth.restorePromise ? 'Reconnecting…' : 'Try again' }}</button>
+      </div>
       <form @submit.prevent="submit">
         <div v-if="error" id="auth-error" class="form-error" role="alert">{{ error }}</div>
         <div v-if="registering" class="form-group">
@@ -122,7 +124,12 @@ async function submit() {
           />
         </div>
         <div class="form-group">
-          <label for="password" class="form-label">Password</label>
+          <div class="auth-password-heading">
+            <label for="password" class="form-label">Password</label>
+            <RouterLink v-if="!registering" to="/forgot-password" class="auth-recovery-link">
+              Forgot your password?
+            </RouterLink>
+          </div>
           <div class="password-field">
             <input
               id="password"

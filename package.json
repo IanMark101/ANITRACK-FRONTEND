@@ -16,7 +16,8 @@
     "postinstall": "node scripts/tooling.mjs quasar prepare --silent",
     "dev:android": "node scripts/tooling.mjs quasar dev -m capacitor -T android",
     "build:android": "npm run typecheck && node scripts/tooling.mjs quasar build -m capacitor -T android",
-    "prepare:android": "node scripts/tooling.mjs quasar build -m capacitor -T android --debug --skip-pkg"
+    "prepare:android": "node scripts/tooling.mjs quasar build -m capacitor -T android --debug --skip-pkg",
+    "icons:android": "node scripts/android-icons.mjs"
   },
   "dependencies": {
     "@capacitor/core": "^8.5.3",
@@ -44,6 +45,11 @@
     "vitest": "^4.1.12",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.1.1"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   },
   "engines": {
     "node": "^22.22.0 || ^24.0.0 || >=26"

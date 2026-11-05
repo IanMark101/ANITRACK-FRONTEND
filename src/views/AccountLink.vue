@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { api, jsonBody } from '../api';
 import type { User } from '../types';
 import { useAuthStore } from '../stores/auth';
+import { safeAuthRedirect } from '../auth-redirect';
 const route = useRoute();
 const auth = useAuthStore();
 const mode = computed(() => route.path === '/verify-email' ? 'verify' : route.path === '/reset-password' ? 'reset' : 'forgot');
@@ -36,8 +37,11 @@ async function submit() {
       message.value = 'Your password has changed. Please sign in again.';
     } else {
       await api('/auth/email/verify', { method: 'POST', body: jsonBody({ token }) });
-      if (auth.user) auth.user = (await api<{ user: User }>('/auth/me')).user;
-      message.value = 'Your email is verified.';
+      if (auth.user) {
+        try { auth.user = (await api<{ user: User }>('/auth/me')).user; }
+        catch { /* The email is verified even when this browser session has expired. */ }
+      }
+      message.value = 'The email associated with this link is now verified.';
     }
     finished.value = true;
   } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Please try again.'; }
@@ -60,7 +64,9 @@ async function submit() {
         </template>
         <button class="btn btn-primary-action" :disabled="busy">{{ busy ? 'Please wait…' : mode === 'verify' ? 'Verify email' : mode === 'reset' ? 'Save password' : 'Send reset link' }}</button>
       </form>
-      <RouterLink to="/login" class="text-action">Back to sign in</RouterLink>
+      <RouterLink v-if="finished && mode === 'verify' && auth.verified" :to="safeAuthRedirect(route.query.redirect)" class="btn btn-primary-action">Continue to AniTrack</RouterLink>
+      <RouterLink v-else-if="mode === 'verify' && auth.authenticated" to="/check-email" class="text-action">Back to email verification</RouterLink>
+      <RouterLink v-else to="/login" class="text-action">Back to sign in</RouterLink>
     </section>
   </main>
 </template>

@@ -96,22 +96,8 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
         <p>Every story you’re watching, saving, and coming back to.</p>
       </div>
       <div v-if="store.items.length" class="page-heading-actions">
-        <button class="btn btn-primary-action" @click="addOpen = true">
-          <PhPlus :size="19" />Add anime</button
-        ><button class="icon-button" aria-label="Collection options">
-          <PhDotsThree :size="24" /><QMenu class="library-menu" auto-close
-            ><button :disabled="store.loading" @click="store.load">Refresh watchlist</button
-            ><button
-              :disabled="store.busy || store.loading"
-              @click="
-                resetOpen = true;
-                resetError = '';
-              "
-            >
-              Reset to starter collection
-            </button></QMenu
-          >
-        </button>
+        <button class="btn btn-primary-action page-add-action" aria-label="Add anime" @click="addOpen = true">
+          <PhPlus :size="19" /><span>Add anime</span></button>
       </div>
     </header>
     <p v-if="notice" class="app-feedback success-feedback" role="status">{{ notice }}</p>
@@ -168,12 +154,20 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
           </button>
         </div>
         <div class="watchlist-tools">
+          <div class="watchlist-search-row">
           <label class="library-search"
             ><PhMagnifyingGlass :size="20" /><input
               v-model="query"
               placeholder="Search your watchlist…"
-              aria-label="Search your watchlist" /></label
-          ><button
+              aria-label="Search your watchlist" /></label>
+            <button class="icon-button" aria-label="Collection options">
+              <PhDotsThree :size="24" /><QMenu class="library-menu" auto-close>
+                <button :disabled="store.loading" @click="store.load">Refresh watchlist</button>
+                <button :disabled="store.busy || store.loading" @click="resetOpen = true; resetError = ''">Reset to starter collection</button>
+              </QMenu>
+            </button>
+          </div>
+          <button
             class="favorites-filter"
             :class="{ active: favoritesOnly }"
             :aria-pressed="favoritesOnly"

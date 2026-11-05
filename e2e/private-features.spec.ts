@@ -3,12 +3,12 @@ import { test, expect, type Page } from '@playwright/test';
 async function sessionApi(page: Page) {
   let signedIn = false;
   const privateRequests: string[] = [];
-  const user = { id: 'access-check', name: 'Access Tester', email: 'access@example.test', role: 'MEMBER', emailVerifiedAt: null };
+  const user = { id: 'access-check', name: 'Access Tester', email: 'access@example.test', role: 'MEMBER', emailVerifiedAt: '2026-11-02T00:00:00.000Z' };
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname.replace('/api', '');
     if (path === '/auth/refresh') return route.fulfill(signedIn
       ? { json: { user, accessToken: 'access-test-token' } }
-      : { status: 401, json: { error: { code: 'UNAUTHENTICATED', message: 'Please sign in.' } } });
+      : { status: 204 });
     if (path === '/auth/login') { signedIn = true; return route.fulfill({ json: { user, accessToken: 'access-test-token' } }); }
     if (path === '/auth/logout') { signedIn = false; return route.fulfill({ status: 204 }); }
     privateRequests.push(path);
@@ -59,7 +59,7 @@ for (const feature of ['discover', 'assistant']) {
     await expect(page.locator(feature === 'assistant' ? '.assistant-page' : '.explore-page')).toBeVisible();
     await expect(page.locator('.workspace-sidebar')).toBeVisible();
     await page.locator('button[aria-label="Log out"]:visible').click();
-    await expect(page).toHaveURL('http://127.0.0.1:5181/');
+    await expect(page).toHaveURL(url => url.pathname === '/');
     await page.goto(`/${feature}`);
     await expect(page).toHaveURL(url => url.pathname === '/login' && url.searchParams.get('redirect') === `/${feature}`);
   });

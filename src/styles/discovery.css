@@ -444,16 +444,14 @@
   max-width: 850px;
   margin: 20px 0 36px;
 }
-.anime-trailer {
-  margin-top: 40px;
-  max-width: 850px;
-}
-.anime-trailer iframe {
-  width: 100%;
-  aspect-ratio: 16/9;
-  border: 1px solid #393943;
-  border-radius: 12px;
-}
+.anime-alternative summary { display: inline-flex; align-items: center; min-height: 44px; cursor: pointer; font-size: 13px; color: #b9b9c3; }
+.anime-alternative p { margin-top: 8px; font-size: 13px; line-height: 1.65; }
+.anime-source-link { margin-left: 12px; }
+.trailer-dialog { width: 920px; }
+.trailer-dialog .trailer-player { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: calc(100dvh - 200px); border: 0; background: #080809; }
+.trailer-source { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 12px; color: #f4f4f4; text-decoration: none; font-size: 14px; }
+.trailer-loading { color: #b9b9c3; font-size: 14px; margin-bottom: 12px; }
+.explore-card-meta > span { display: inline-flex; align-items: center; gap: 4px; }
 .anime-episodes > details {
   border-bottom: 1px solid #33333e;
   padding: 19px 0;
