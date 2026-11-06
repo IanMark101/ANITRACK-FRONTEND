@@ -78,7 +78,9 @@ export default defineRouter(({ store }) => {
   });
   router.beforeEach(async (to) => {
     const auth = useAuthStore(store);
-    await auth.restore();
+    // Public reading and account forms stay usable while the API is unreachable.
+    // A failed private restore has its own explicit retry view.
+    if (to.meta.protected && !auth.sessionError) await auth.restore();
     if (to.meta.protected && !auth.authenticated && !auth.sessionError)
       return { path: '/login', query: { redirect: to.fullPath } };
     if (auth.authenticated && !auth.verified && to.meta.protected && !to.meta.allowUnverified)
@@ -90,6 +92,15 @@ export default defineRouter(({ store }) => {
   });
   router.afterEach((to) => {
     document.title = `AniTrack | ${to.meta.title ?? 'Anime watchlist'}`;
+    const auth = useAuthStore(store);
+    if (!auth.restored && !auth.sessionError) {
+      void auth.restore().then(() => {
+        const current = router.currentRoute.value;
+        if (auth.authenticated && (current.path === '/' || current.meta.guestOnly))
+          return router.replace(auth.verified ? safeAuthRedirect(current.query.redirect)
+            : { path: '/check-email', query: { redirect: safeAuthRedirect(current.query.redirect) } });
+      });
+    }
   });
   return router;
 });

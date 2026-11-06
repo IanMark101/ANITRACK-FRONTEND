@@ -29,3 +29,5 @@ Actual Gmail receipt is still unconfirmed by the user. The required genuine desk
 ## Cleanup
 
 The disposable native review account was deleted through the app. The fixture schemas anitrack_browser_9094b79d97f24c52af9b6f400bdd1692 and anitrack_browser_89d0ee6c7eae4a368b7f38c253a51451 were removed by their owning runners with captured mail/temp directories. Earlier owned-schema disconnect cleanup was retried and verified absent. Main user records were preserved. Test proxies and review browser profiles were closed, and temporary local QA files are removed after their durable results are recorded. The normal frontend/API remain running.
+
+Gmail connectivity update (5 November 2026): port 587 timed out on this network. Port 465 with TLS successfully authenticated; the local backend now uses SMTP_PORT=465 and SMTP_SECURE=1, with app-password display spaces removed. No message was sent during authentication checks. Actual verification/reset inbox receipt remains the user's final check.

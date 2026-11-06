@@ -43,4 +43,13 @@ describe('Session recovery state', () => {
     expect(store.sessionError).toBe('');
     expect(store.authenticated).toBe(false);
   });
+  it('keeps an existing account and gives a useful connection message during an outage', async () => {
+    const store = useAuthStore();
+    store.user = { id: 'member', name: 'Member', email: 'member@example.test', role: 'MEMBER', emailVerifiedAt: '2026-11-02T00:00:00.000Z' };
+    mocks.refresh.mockRejectedValueOnce(new ApiError(0, 'NETWORK_ERROR', 'Cannot reach AniTrack. Keep the laptop running.'));
+    await store.restore();
+    expect(store.user?.id).toBe('member');
+    expect(store.restored).toBe(false);
+    expect(store.sessionError).toContain('Keep the laptop running');
+  });
 });

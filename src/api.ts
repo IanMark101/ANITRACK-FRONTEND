@@ -1,5 +1,5 @@
 import type { Session } from './types';
-import { request } from './api-transport';
+import { networkErrorMessage, request } from './api-transport';
 
 let token: string | null = null;
 let refreshPromise: Promise<Session> | null = null;
@@ -42,7 +42,7 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(
       0,
       'NETWORK_ERROR',
-      'Cannot reach AniTrack. Check your connection and try again.'
+      networkErrorMessage()
     );
   }
   if (response.status === 204) return undefined as T;
@@ -68,11 +68,12 @@ async function send<T>(path: string, options: RequestInit = {}): Promise<T> {
 export function refreshSession(): Promise<Session> {
   if (!refreshPromise) {
     const version = identityVersion;
-    const refresh = () => send<Session | undefined>('/auth/refresh', { method: 'POST' });
+    const signal = AbortSignal.timeout(8000);
+    const refresh = () => send<Session | undefined>('/auth/refresh', { method: 'POST', signal });
     // Browser tabs share the rotating cookie; serialize refreshes across tabs too.
     const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
     const pending = Promise.resolve(
-      locks ? locks.request('anitrack-session-refresh', refresh) : refresh()
+      locks ? locks.request('anitrack-session-refresh', { signal }, refresh) : refresh()
     )
       .then((session) => {
         if (version !== identityVersion) throw new ApiError(409, 'SESSION_CHANGED', 'Your account changed. Please try again.');

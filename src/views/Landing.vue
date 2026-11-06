@@ -89,7 +89,14 @@ onBeforeUnmount(() => {
   <main ref="page" class="landing-page">
     <section class="landing-hero container">
       <div class="hero-copy">
-        <h1>Your anime.<br />Your next chapter.</h1>
+        <div class="hero-intro">
+          <h1><span class="hero-title-desktop">Your anime.<br />Your next chapter.</span><span class="hero-title-mobile">Your anime.<br />Your space.</span></h1>
+          <div class="hero-mobile-art" aria-hidden="true">
+            <img src="/images/editorial/frieren.webp" alt="" width="250" height="360" />
+            <img src="/images/editorial/fullmetal-alchemist.webp" alt="" width="250" height="360" />
+            <img src="/images/editorial/demon-slayer.webp" alt="" width="250" height="360" />
+          </div>
+        </div>
         <p class="hero-description">
           Keep the stories you love close. Track your watches, rate your favorites, and find what
           comes next.
@@ -283,6 +290,14 @@ onBeforeUnmount(() => {
   width: 100%;
   max-width: 900px;
 }
+.hero-title-mobile,
+.hero-mobile-art {
+  display: none;
+}
+.hero-mobile-art,
+.hero-art {
+  pointer-events: none;
+}
 .hero-copy h1 {
   font-family: Outfit, sans-serif;
   font-size: clamp(44px, 5.9vw, 84px);
@@ -314,8 +329,8 @@ onBeforeUnmount(() => {
   z-index: 0;
   overflow: hidden;
   mask-image:
-    linear-gradient(to right, transparent, #000 35%),
-    linear-gradient(to bottom, transparent, #000 15%, #000 78%, transparent);
+    linear-gradient(to right, transparent, #000 35%), /* taste-skill-ignore: gradient -- alpha mask fades the existing desktop cover art. */
+    linear-gradient(to bottom, transparent, #000 15%, #000 78%, transparent); /* taste-skill-ignore: gradient -- alpha mask, not a colored surface. */
   mask-composite: intersect;
   opacity: 0.78;
 }
@@ -323,7 +338,7 @@ onBeforeUnmount(() => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #11111466, transparent 75%);
+  background: linear-gradient(90deg, #11111466, transparent 75%); /* taste-skill-ignore: gradient -- neutral scrim over cover art for readable copy. */
   pointer-events: none;
 }
 .hero-art-column {
@@ -444,7 +459,7 @@ onBeforeUnmount(() => {
   object-fit: cover;
   transform: rotate(13deg);
   opacity: 0.7;
-  mask-image: linear-gradient(to left, #000, transparent);
+  mask-image: linear-gradient(to left, #000, transparent); /* taste-skill-ignore: gradient -- neutral alpha mask on existing artwork. */
 }
 .feature-statuses {
   position: relative;
@@ -508,7 +523,7 @@ onBeforeUnmount(() => {
   object-fit: cover;
   object-position: center 30%;
   opacity: 0.45;
-  mask-image: linear-gradient(to bottom, #000, transparent);
+  mask-image: linear-gradient(to bottom, #000, transparent); /* taste-skill-ignore: gradient -- neutral alpha mask on the spotlight photograph. */
 }
 .feature-spotlight .feature-copy {
   max-width: 420px;
@@ -573,7 +588,7 @@ onBeforeUnmount(() => {
   object-fit: cover;
   opacity: 0.35;
   z-index: -2;
-  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 70%, transparent); /* taste-skill-ignore: gradient -- neutral alpha fade on the landscape image. */
 }
 .landing-cta::before {
   content: '';
@@ -612,7 +627,7 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 .landing-page .btn-primary-action {
-  box-shadow: none;
+  box-shadow: none; /* taste-skill-ignore: shadow -- removes the inherited button shadow. */
 }
 .landing-page .btn-primary-action:hover {
   transform: translateY(-2px);
@@ -661,20 +676,60 @@ onBeforeUnmount(() => {
 }
 @media (max-width: 767px) {
   .landing-hero {
-    display: flex;
-    align-items: center;
-    padding-top: 40px;
-    padding-bottom: 40px;
-    min-height: min(580px, calc(100svh - 108px));
+    display: block;
+    padding-top: 28px;
+    padding-bottom: 24px;
+    min-height: 0;
     overflow: hidden;
   }
+  .hero-intro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-title-desktop {
+    display: none;
+  }
+  .hero-title-mobile {
+    display: inline;
+  }
   .hero-copy h1 {
-    font-size: clamp(32px, 9vw, 40px);
-    letter-spacing: -1.2px;
+    flex: 1;
+    min-width: 0;
+    font-size: clamp(28px, 8vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -.8px;
+  }
+  .hero-mobile-art {
+    display: block;
+    position: relative;
+    flex: 0 0 clamp(112px, 34vw, 136px);
+    height: 152px;
+  }
+  .hero-mobile-art img {
+    position: absolute;
+    top: 12px;
+    width: 62%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .hero-mobile-art img:nth-child(1) {
+    left: 2%;
+    transform: rotate(-12deg);
+  }
+  .hero-mobile-art img:nth-child(2) {
+    left: 19%;
+    top: 4px;
+  }
+  .hero-mobile-art img:nth-child(3) {
+    left: 36%;
+    transform: rotate(12deg);
   }
   .hero-description {
-    font-size: 16px;
-    line-height: 1.75;
+    font-size: 15px;
+    line-height: 1.7;
     max-width: 36ch;
     margin-top: 16px;
   }
@@ -682,7 +737,7 @@ onBeforeUnmount(() => {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    margin-top: 24px;
+    margin-top: 20px;
   }
   .large-button {
     min-height: 48px;
@@ -697,41 +752,10 @@ onBeforeUnmount(() => {
     justify-content: center;
   }
   .hero-art {
-    /* The posters remain one backdrop inside the hero, with copy above the scrim. */
-    position: absolute;
-    inset: -30px -60px -30px 20%;
-    height: auto;
-    margin: 0;
-    transform: rotate(-10deg);
-    opacity: .55;
-    gap: 10px;
-    mask-image: none;
-    border-radius: 0;
-  }
-  .hero-art::after {
-    display: block;
-    /* taste-skill-ignore: gradient -- neutral scrim over real cover art for legibility. */
-    background: linear-gradient(90deg, #101012f5, #101012bd 38%, #10101266 100%);
-  }
-  .hero-art-column {
-    gap: 10px;
-  }
-  .hero-art-column img {
-    height: 240px;
-    aspect-ratio: auto;
-    border-radius: 8px;
-  }
-  .art-column-one {
-    margin-top: -70px;
-  }
-  .art-column-two {
-    margin-top: 15px;
-  }
-  .art-column-three {
-    margin-top: -45px;
+    display: none;
   }
   .genre-strip {
-    padding: 20px;
+    display: none;
   }
   .genre-track {
     font-size: 20px;
@@ -748,7 +772,7 @@ onBeforeUnmount(() => {
     margin-bottom: 30px;
   }
   .landing-page h2 {
-    font-size: 35px;
+    font-size: 28px;
     letter-spacing: -1px;
   }
   .section-intro p {
@@ -771,7 +795,11 @@ onBeforeUnmount(() => {
     max-width: 240px;
   }
   .feature-tile h3 {
-    font-size: 25px;
+    font-size: 22px;
+  }
+  .feature-tile p {
+    font-size: 15px;
+    line-height: 1.7;
   }
   .feature-spotlight {
     min-height: 320px;
@@ -784,7 +812,7 @@ onBeforeUnmount(() => {
     margin-bottom: 40px;
   }
   .journey-heading p {
-    font-size: 13px;
+    font-size: 15px;
   }
   .journey-gallery {
     gap: 30px;
@@ -796,7 +824,7 @@ onBeforeUnmount(() => {
     padding: 100px 20px;
   }
   .landing-cta h2 {
-    font-size: 36px;
+    font-size: 28px;
   }
 }
 </style>

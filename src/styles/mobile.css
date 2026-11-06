@@ -93,8 +93,6 @@
   .anitrack-layout .landing-page .feature-tile h3 { font-size: 22px; line-height: 1.3; }
   .anitrack-layout .landing-page .feature-tile p,
   .anitrack-layout .landing-page .member-feature-story p { font-size: 16px; line-height: 1.7; }
-  .anitrack-layout .mobile-app-nav { justify-content: space-between; gap: 8px 16px; }
-  .anitrack-layout .mobile-app-nav a { font-size: 13px; }
   .anitrack-layout :is(.btn, .collection-primary, .collection-text-button) {
     min-height: 44px;
     max-width: 100%;

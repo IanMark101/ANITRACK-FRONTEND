@@ -14,12 +14,14 @@ import {
   PhCloudSlash,
   PhUserCircle,
   PhStack,
-  PhDotsThree
+  PhDotsThree,
+  PhList
 } from '@phosphor-icons/vue';
 import { useAuthStore } from './stores/auth';
 import { useWatchlistStore } from './stores/watchlist';
 import { useAssistantStore } from './stores/assistant';
 import BrandMark from './components/BrandMark.vue';
+import { safeAuthRedirect } from './auth-redirect';
 import './styles/collections.css';
 const auth = useAuthStore();
 const watchlist = useWatchlistStore();
@@ -29,6 +31,7 @@ const authScreen = computed(() => ['/login', '/register', '/forgot-password', '/
 const assistant = useAssistantStore();
 const logoutError = ref('');
 const reconnecting = ref(false);
+const publicMenuOpen = ref(false);
 const starting = computed(() => !route.matched.length && Boolean(auth.restorePromise));
 const workspace = computed(
   () => auth.verified || Boolean(route.meta.protected && auth.sessionError && !auth.authenticated)
@@ -76,6 +79,8 @@ async function reconnect() {
   }
   if (auth.restored && !auth.authenticated && route.meta.protected)
     await router.replace({ path: '/login', query: { redirect: route.fullPath } });
+  else if (auth.authenticated && (route.path === '/' || route.meta.guestOnly))
+    await router.replace(safeAuthRedirect(route.query.redirect));
 }
 </script>
 
@@ -179,22 +184,34 @@ async function reconnect() {
             <template v-else><RouterLink to="/login" class="login-link">Log in</RouterLink
             ><RouterLink to="/register" class="btn btn-primary-action signup-link"
               >Sign up <PhArrowUpRight :size="17"
-            /></RouterLink></template>
+            /></RouterLink>
+            <button
+              v-if="!authScreen"
+              class="icon-button public-menu-trigger"
+              aria-label="Navigation"
+              aria-haspopup="true"
+              :aria-expanded="publicMenuOpen"
+              :aria-controls="publicMenuOpen ? 'public-mobile-menu' : undefined"
+            >
+              <PhList :size="23" />
+              <QMenu v-model="publicMenuOpen" class="public-mobile-menu" anchor="bottom right" self="top right" :offset="[0, 8]">
+                <nav id="public-mobile-menu" aria-label="Explore AniTrack">
+                  <RouterLink v-close-popup to="/#features">Features</RouterLink>
+                  <RouterLink v-close-popup to="/#discover">Discover</RouterLink>
+                  <RouterLink v-close-popup to="/#assistant">Anime Assistant</RouterLink>
+                </nav>
+              </QMenu>
+            </button></template>
           </div>
         </div>
       </header>
-      <nav
-        v-if="!['/login', '/register', '/check-email', '/verify-email', '/forgot-password', '/reset-password'].includes(route.path)"
-        class="mobile-app-nav"
-        aria-label="Explore AniTrack"
-      >
-        <RouterLink to="/#features">Features</RouterLink
-        ><RouterLink to="/#discover">Discover</RouterLink
-        ><RouterLink to="/#assistant">Anime Assistant</RouterLink>
-      </nav>
     </template>
     <QPageContainer v-if="!starting"
       ><div id="page-content" tabindex="-1">
+        <aside v-if="auth.sessionError && !workspace && !authScreen" class="public-connection-notice container" role="status">
+          <p>{{ auth.sessionError }}</p>
+          <button type="button" :disabled="reconnecting" @click="reconnect">{{ reconnecting ? 'Reconnecting…' : 'Try again' }}</button>
+        </aside>
         <p v-if="logoutError" class="app-feedback error-feedback" role="alert">
           {{ logoutError }} <button @click="logout">Try again</button>
         </p>

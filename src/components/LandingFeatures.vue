@@ -40,8 +40,8 @@ import { PhArrowRight } from '@phosphor-icons/vue';
 .assistant-feature-story > img { grid-column: 1; grid-row: 1; }
 @media (max-width: 800px) {
   .member-feature-stories { padding-top: 48px; }
-  .member-feature-story { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 40px; scroll-margin-top: 140px; }
-  .member-feature-story h2 { font-size: 36px; max-width: 17ch; }
+  .member-feature-story { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 40px; scroll-margin-top: 92px; }
+  .member-feature-story h2 { font-size: 28px; max-width: 20ch; }
   .assistant-feature-story .member-feature-copy, .assistant-feature-story > img { grid-column: auto; grid-row: auto; }
   .member-feature-story > img { max-height: 360px; }
 }

@@ -36,6 +36,84 @@ test('landing describes member features without loading a catalog or exposing fe
   await expect(page).toHaveURL(url => url.pathname === '/login' && url.searchParams.get('redirect') === '/assistant');
 });
 
+test('phone landing keeps its artwork beside the title and navigation in one header row', async ({ page }) => {
+  const requests = await sessionApi(page);
+  for (const width of [320, 360, 390]) {
+    await page.setViewportSize({ width, height: 562 });
+    await page.goto('/');
+    await expect(page.locator('.hero-title-mobile')).toBeVisible();
+    const layout = await page.evaluate(() => {
+      const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+      const heading = box('.hero-copy h1');
+      const art = box('.hero-mobile-art');
+      const description = box('.hero-description');
+      const action = box('.landing-actions .btn');
+      const brand = box('.logo-area');
+      const login = box('.login-link');
+      return {
+        overflow: document.documentElement.scrollWidth > innerWidth,
+        titleClearOfArt: heading.right <= art.left,
+        artBesideTitle: heading.top < art.bottom && art.top < heading.bottom,
+        artAboveDescription: art.bottom <= description.top,
+        actionOnFirstScreen: action.bottom <= innerHeight,
+        headerFits: brand.right < login.left,
+        headerRows: document.querySelector('header')!.getBoundingClientRect().height
+      };
+    });
+    expect(layout).toEqual({
+      overflow: false, titleClearOfArt: true, artBesideTitle: true,
+      artAboveDescription: true, actionOnFirstScreen: true, headerFits: true, headerRows: 64
+    });
+  }
+  const menu = page.getByRole('button', { name: 'Navigation', exact: true });
+  await menu.click();
+  await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+  await expect(menu).toBeFocused();
+  await menu.click();
+  await page.locator('#public-mobile-menu').getByRole('link', { name: 'Discover', exact: true }).click();
+  await expect(page).toHaveURL(url => url.hash === '#discover');
+  await expect(page.locator('#public-mobile-menu')).toHaveCount(0);
+  expect(requests).toEqual([]);
+});
+
+test('landing and account links stay responsive while session restoration is stalled', async ({ page }) => {
+  let finish!: () => void;
+  let attempts = 0;
+  await page.route('**/api/auth/refresh', async route => {
+    attempts++;
+    await new Promise<void>(resolve => { finish = resolve; });
+    await route.abort();
+  });
+  try {
+    await page.setViewportSize({ width: 360, height: 784 });
+    await page.goto('/');
+    await expect(page.locator('.landing-page')).toBeVisible({ timeout: 2500 });
+    await page.getByRole('link', { name: 'Start your watchlist', exact: true }).click({ timeout: 2500 });
+    await expect(page.getByLabel('Your name', { exact: true })).toBeVisible({ timeout: 2500 });
+    await page.locator('.auth-switch').getByRole('link', { name: 'Log in', exact: true }).click({ timeout: 2500 });
+    await expect(page.getByLabel('Password', { exact: true })).toBeVisible({ timeout: 2500 });
+    await page.getByRole('link', { name: 'Forgot your password?', exact: true }).click({ timeout: 2500 });
+    await expect(page).toHaveURL(url => url.pathname === '/forgot-password');
+    expect(attempts).toBe(1);
+  } finally {
+    finish?.();
+  }
+});
+
+test('landing can recover a connection without blocking public navigation', async ({ page }) => {
+  let attempts = 0;
+  await page.route('**/api/auth/refresh', route => ++attempts === 1
+    ? route.abort('connectionfailed') : route.fulfill({ status: 204 }));
+  await page.goto('/');
+  await expect(page.locator('.public-connection-notice')).toContainText('Cannot reach AniTrack');
+  await page.locator('.public-connection-notice').getByRole('button', { name: 'Try again', exact: true }).click();
+  await expect(page.locator('.public-connection-notice')).toHaveCount(0);
+  await expect(page.locator('.landing-page')).toBeVisible();
+  expect(attempts).toBe(2);
+});
+
 for (const path of ['/discover?q=Frieren', '/assistant', '/anime/kitsu/123', '/anime/local/saved-title']) {
   test(`guest access to ${path} requires login before loading private data`, async ({ page }) => {
     const requests = await sessionApi(page);

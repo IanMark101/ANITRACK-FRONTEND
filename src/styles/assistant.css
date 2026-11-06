@@ -376,9 +376,6 @@
   line-height: 1.9;
   color: #9d9daf;
 }
-.mobile-app-nav {
-  display: none;
-}
 .discover-assistant-link {
   display: flex;
   justify-content: space-between;
@@ -425,9 +422,6 @@
   }
 }
 @media (max-width: 800px) {
-  .app-header .main-nav {
-    display: none;
-  }
   .assistant-workspace {
     grid-template-columns: 1fr;
   }
@@ -443,25 +437,6 @@
   }
   .assistant-results .explore-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .mobile-app-nav {
-    display: flex;
-    gap: 24px;
-    padding: 0 20px;
-    flex-wrap: wrap;
-    background: #18181c;
-  }
-  .mobile-app-nav a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    font-size: 13px;
-    color: #bdbdca;
-    text-decoration: none;
-    line-height: 1.8;
-  }
-  .mobile-app-nav .router-link-active {
-    color: #ffb4bc;
   }
 }
 @media (max-width: 560px) {

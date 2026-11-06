@@ -41,8 +41,9 @@ export const useAuthStore = defineStore('auth', {
             this.sessionError = '';
             this.restored = true;
           } else {
-            this.sessionError =
-              'We could not reconnect to AniTrack. Your session may still be valid. Please try again.';
+            this.sessionError = error instanceof ApiError && error.code === 'NETWORK_ERROR'
+              ? error.message
+              : 'We could not reconnect to AniTrack. Your session may still be valid. Please try again.';
           }
         } finally {
           if (restoration === this.restoration) this.restorePromise = null;

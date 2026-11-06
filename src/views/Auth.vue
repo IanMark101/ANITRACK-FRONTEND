@@ -34,6 +34,10 @@ const email = ref('');
 const password = ref('');
 const error = ref('');
 const showPassword = ref(false);
+async function reconnect() {
+  await auth.restore();
+  if (auth.authenticated) await router.replace(safeAuthRedirect(route.query.redirect));
+}
 async function submit() {
   error.value = '';
   if (registering.value && name.value.trim().length < 2) {
@@ -91,7 +95,7 @@ async function submit() {
       </p>
       <div v-if="auth.sessionError" class="session-notice" role="alert">
         <p>{{ auth.sessionError }}</p>
-        <button type="button" :disabled="Boolean(auth.restorePromise)" @click="auth.restore()">{{ auth.restorePromise ? 'Reconnecting…' : 'Try again' }}</button>
+        <button type="button" :disabled="Boolean(auth.restorePromise)" @click="reconnect">{{ auth.restorePromise ? 'Reconnecting…' : 'Try again' }}</button>
       </div>
       <form @submit.prevent="submit">
         <div v-if="error" id="auth-error" class="form-error" role="alert">{{ error }}</div>
