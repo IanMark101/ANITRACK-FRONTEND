@@ -67,6 +67,10 @@ function say(message: string) {
     notice.value = '';
   }, 4000);
 }
+function showAddedTitle(title: string) {
+  clear();
+  say(`${title} added to your watchlist.`);
+}
 async function reset() {
   resetError.value = '';
   try {
@@ -206,7 +210,7 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
     </template>
     <AddAnimeDialog
       v-model="addOpen"
-      @saved="(title) => say(`${title} added to your watchlist.`)"
+      @saved="showAddedTitle"
     />
     <QDialog v-model="resetOpen" :persistent="store.busy"
       ><section class="app-dialog small-dialog" aria-labelledby="reset-heading">
