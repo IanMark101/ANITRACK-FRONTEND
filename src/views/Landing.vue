@@ -1,14 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import {
-  PhArrowRight,
-  PhArrowUpRight,
-  PhBookmarkSimple,
-  PhHeart,
-  PhStar,
-  PhPlay,
-  PhCheck
-} from '@phosphor-icons/vue';
+import { PhArrowRight, PhArrowUpRight } from '@phosphor-icons/vue';
 import { useAuthStore } from '../stores/auth';
 import LandingFeatures from '../components/LandingFeatures.vue';
 
@@ -41,38 +33,13 @@ onMounted(async () => {
         stagger: 0.12,
         ease: 'power3.out'
       });
-      gsap.utils.toArray<HTMLElement>('.feature-tile').forEach((tile) =>
-        gsap.from(tile, {
-          y: 30,
-          opacity: 0,
-          duration: 0.65,
-          scrollTrigger: { trigger: tile, start: 'top 90%', once: true }
-        })
-      );
-      gsap.utils.toArray<HTMLElement>('.journey-image').forEach((image) =>
-        gsap.fromTo(
-          image,
-          { scale: 0.92, opacity: 0.5 },
-          {
-            scale: 1,
-            opacity: 1,
-            scrollTrigger: { trigger: image, start: 'top 90%', end: 'top 45%', scrub: 1 }
-          }
-        )
-      );
-    },
-    page.value
-  );
-  media.add(
-    '(min-width: 1024px) and (prefers-reduced-motion: no-preference)',
-    () => {
-      ScrollTrigger.create({
-        trigger: '.journey-section',
-        start: 'top 110px',
-        end: 'bottom 75%',
-        pin: '.journey-heading',
-        pinSpacing: false,
-        invalidateOnRefresh: true
+      gsap.utils.toArray<HTMLElement>('.product-story [data-ui]', page.value).forEach((sample) => {
+        gsap.from(sample, {
+          y: 18,
+          duration: 0.55,
+          ease: 'power2.out',
+          scrollTrigger: { trigger: sample, start: 'top 92%', once: true }
+        });
       });
     },
     page.value
@@ -140,113 +107,6 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <div class="genre-strip" aria-label="A place for every genre">
-      <div class="genre-track">
-        <span>Adventure</span><PhStar :size="24" /><span>Slice of life</span
-        ><PhStar :size="24" /><span>Fantasy</span><PhStar :size="24" /><span>Romance</span
-        ><PhStar :size="24" /><span>Action</span><PhStar :size="24" /><span aria-hidden="true"
-          >Adventure</span
-        ><PhStar :size="24" aria-hidden="true" /><span aria-hidden="true">Slice of life</span>
-      </div>
-    </div>
-
-    <section id="features" class="landing-section container">
-      <div class="section-intro">
-        <h2>Track every chapter.</h2>
-        <p>One personal collection, built around how you watch.</p>
-      </div>
-      <div class="feature-grid">
-        <article class="feature-tile feature-watch">
-          <div class="feature-copy">
-            <PhBookmarkSimple :size="30" />
-            <h3>Your watchlist.</h3>
-            <p>Watching, completed, or saved for later. Keep your next adventure within reach.</p>
-          </div>
-          <img
-            src="/images/editorial/haikyu.webp"
-            alt="Haikyu anime key visual"
-            loading="lazy"
-            width="300"
-            height="400"
-          />
-          <div class="feature-statuses">
-            <span><PhPlay :size="15" /> Watching</span><span><PhCheck :size="15" /> Completed</span
-            ><span><PhBookmarkSimple :size="15" /> Plan to Watch</span>
-          </div>
-        </article>
-        <article class="feature-tile feature-rating">
-          <PhStar :size="36" weight="fill" />
-          <h3>Your taste.<br />Your rating.</h3>
-          <p>Give each story a personal score. Find your favorites at a glance.</p>
-        </article>
-        <article class="feature-tile feature-favorite">
-          <div class="favorite-visual">
-            <img
-              src="/images/editorial/violet-evergarden.webp"
-              alt="Violet Evergarden anime key visual"
-              loading="lazy"
-              width="240"
-              height="340"
-            /><PhHeart :size="52" weight="fill" />
-          </div>
-          <div class="feature-copy">
-            <h3>Your favorites.</h3>
-            <p>A heart for the stories you’ll always come back to.</p>
-          </div>
-        </article>
-        <article class="feature-tile feature-spotlight">
-          <img
-            src="/images/editorial/howls-moving-castle.webp"
-            alt="Howl's moving castle floating among the clouds"
-            loading="lazy"
-            width="1440"
-            height="779"
-          />
-          <div class="feature-copy">
-            <h3>Your spotlight.</h3>
-            <p>Make your dashboard yours, with a featured title you choose.</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="journey-section container landing-section">
-      <div class="journey-heading">
-        <h2>For every kind<br />of anime fan.</h2>
-        <p>The weekend binge. The long-running epic. The one you watched twice.</p>
-        <RouterLink :to="destination" class="text-action"
-          >{{ auth.authenticated ? 'Open your collection' : 'Make a collection of your own' }}
-          <PhArrowRight :size="20"
-        /></RouterLink>
-      </div>
-      <div class="journey-gallery">
-        <figure>
-          <div class="journey-image">
-            <img
-              src="/images/editorial/castle-in-the-sky.webp"
-              alt="Overgrown towers and gardens of Laputa in Castle in the Sky"
-              loading="lazy"
-              width="1440"
-              height="779"
-            />
-          </div>
-          <figcaption>For the worlds you get lost in.</figcaption>
-        </figure>
-        <figure>
-          <div class="journey-image">
-            <img
-              src="/images/editorial/spirited-away.webp"
-              alt="Chihiro and Haku facing each other in Spirited Away"
-              loading="lazy"
-              width="1440"
-              height="779"
-            />
-          </div>
-          <figcaption>For the stories that stay with you.</figcaption>
-        </figure>
-      </div>
-    </section>
-
     <LandingFeatures />
 
     <section class="landing-cta container">
@@ -259,7 +119,7 @@ onBeforeUnmount(() => {
         height="900"
       />
       <h2>
-        Your next story.<br /><span>Starts here.</span>
+        Start your watchlist.
       </h2>
       <RouterLink :to="destination" class="btn btn-primary-action large-button"
         >{{ auth.authenticated ? 'Go to dashboard' : 'Create your account' }}
@@ -299,7 +159,7 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 .hero-copy h1 {
-  font-family: Outfit, sans-serif;
+  font-family: Outfit, sans-serif; /* taste-skill-ignore: default-font -- AniTrack's installed brand typeface. */
   font-size: clamp(44px, 5.9vw, 84px);
   line-height: 1.08;
   letter-spacing: -3.2px;
@@ -366,212 +226,6 @@ onBeforeUnmount(() => {
 .art-column-three {
   margin-top: 70px;
 }
-.genre-strip {
-  padding: 29px 20px;
-  color: #8d8d99;
-}
-.genre-track {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px 32px;
-  align-items: center;
-  font-family: Outfit, sans-serif;
-  font-size: 24px;
-}
-.genre-track [aria-hidden='true'] {
-  display: none;
-}
-.genre-track svg {
-  color: #723d43;
-  flex-shrink: 0;
-}
-.landing-section {
-  padding-top: 130px;
-  padding-bottom: 40px;
-  scroll-margin-top: 80px;
-}
-.section-intro {
-  margin-bottom: 50px;
-}
-.landing-page h2 {
-  font-family: Outfit, sans-serif;
-  font-size: clamp(34px, 4vw, 56px);
-  line-height: 1.14;
-  letter-spacing: -1.8px;
-  font-weight: 600;
-}
-.landing-page h2 span {
-  color: #898995;
-}
-.section-intro p {
-  color: #a9a9b5;
-  margin-top: 20px;
-  font-size: 14px;
-}
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-flow: dense;
-  gap: 20px;
-}
-.feature-tile {
-  position: relative;
-  background: #1a1a1f;
-  border-radius: 16px;
-  overflow: hidden;
-  min-height: 320px;
-  padding: 36px;
-}
-.feature-copy {
-  position: relative;
-  z-index: 1;
-  max-width: 350px;
-}
-.feature-tile h3 {
-  font-family: Outfit, sans-serif;
-  font-size: 27px;
-  line-height: 1.2;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  margin-top: 18px;
-}
-.feature-tile p {
-  color: #b8b8c3;
-  font-size: 13px;
-  line-height: 1.85;
-  margin-top: 16px;
-  max-width: 290px;
-}
-.feature-watch {
-  grid-column: span 7;
-  min-height: 350px;
-}
-.feature-watch .feature-copy {
-  max-width: 280px;
-}
-.feature-watch > img {
-  position: absolute;
-  right: -15px;
-  top: -40px;
-  width: 250px;
-  height: 400px;
-  object-fit: cover;
-  transform: rotate(13deg);
-  opacity: 0.7;
-  mask-image: linear-gradient(to left, #000, transparent); /* taste-skill-ignore: gradient -- neutral alpha mask on existing artwork. */
-}
-.feature-statuses {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 32px;
-}
-.feature-statuses span {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  padding: 9px 12px;
-  border: 1px solid #454550;
-  border-radius: 7px;
-  font-size: 13px;
-  background: #17171ed9;
-}
-.feature-rating {
-  grid-column: span 5;
-  background: #241d21;
-}
-.feature-rating > svg {
-  color: #f3b3b8;
-}
-.feature-favorite {
-  grid-column: span 5;
-}
-.favorite-visual {
-  position: relative;
-  height: 155px;
-  margin-bottom: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.favorite-visual img {
-  width: 108px;
-  height: 160px;
-  object-fit: cover;
-  transform: rotate(-9deg);
-  border-radius: 8px;
-}
-.favorite-visual svg {
-  color: #e50914;
-  margin-left: 28px;
-}
-.feature-spotlight {
-  grid-column: span 7;
-  display: flex;
-  align-items: flex-end;
-  min-height: 340px;
-  background: #1e1e24;
-}
-.feature-spotlight > img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-  opacity: 0.45;
-  mask-image: linear-gradient(to bottom, #000, transparent); /* taste-skill-ignore: gradient -- neutral alpha mask on the spotlight photograph. */
-}
-.feature-spotlight .feature-copy {
-  max-width: 420px;
-}
-.journey-section {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: 90px;
-  align-items: start;
-  padding-top: 170px;
-}
-.journey-heading {
-  padding-top: 20px;
-}
-.journey-heading p {
-  color: #b8b8c3;
-  max-width: 310px;
-  line-height: 1.9;
-  margin: 24px 0 30px;
-  font-size: 14px;
-}
-.journey-gallery {
-  display: grid;
-  gap: 50px;
-}
-.journey-gallery figure {
-  margin: 0;
-}
-.journey-image {
-  overflow: hidden;
-  border-radius: 16px;
-  aspect-ratio: 1.5;
-}
-.journey-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.7s;
-}
-.journey-image:hover img {
-  transform: scale(1.04);
-}
-.journey-gallery figcaption {
-  color: #aaaab6;
-  margin-top: 18px;
-  font-size: 13px;
-}
 .landing-cta {
   position: relative;
   isolation: isolate;
@@ -601,9 +255,6 @@ onBeforeUnmount(() => {
 .landing-cta h2 {
   margin: 24px 0 34px;
   font-size: clamp(36px, 4.7vw, 65px);
-}
-.landing-cta h2 span {
-  color: #f3b3b8;
 }
 .landing-cta .btn {
   margin: auto;
@@ -651,28 +302,7 @@ onBeforeUnmount(() => {
     left: 35%;
     opacity: 0.45;
   }
-  .feature-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .feature-tile {
-    grid-column: auto;
-    padding: 28px;
-  }
-  .feature-watch .feature-copy {
-    max-width: 220px;
-  }
-  .feature-watch > img {
-    width: 190px;
-  }
-  .journey-section {
-    gap: 40px;
-  }
-  .journey-heading h2 {
-    font-size: 42px;
-  }
-  .poster-choice-image {
-    height: 280px;
-  }
+
 }
 @media (max-width: 767px) {
   .landing-hero {
@@ -753,72 +383,6 @@ onBeforeUnmount(() => {
   }
   .hero-art {
     display: none;
-  }
-  .genre-strip {
-    display: none;
-  }
-  .genre-track {
-    font-size: 20px;
-    gap: 16px 20px;
-  }
-  .genre-track svg {
-    display: none;
-  }
-  .landing-section {
-    padding-top: 85px;
-    padding-bottom: 0;
-  }
-  .section-intro {
-    margin-bottom: 30px;
-  }
-  .landing-page h2 {
-    font-size: 28px;
-    letter-spacing: -1px;
-  }
-  .section-intro p {
-    font-size: 14px;
-    max-width: 290px;
-    line-height: 1.8;
-  }
-  .feature-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .feature-tile {
-    grid-column: auto;
-    min-height: 280px;
-  }
-  .feature-watch {
-    min-height: 320px;
-  }
-  .feature-watch .feature-copy {
-    max-width: 240px;
-  }
-  .feature-tile h3 {
-    font-size: 22px;
-  }
-  .feature-tile p {
-    font-size: 15px;
-    line-height: 1.7;
-  }
-  .feature-spotlight {
-    min-height: 320px;
-  }
-  .journey-section {
-    display: block;
-    padding-top: 100px;
-  }
-  .journey-heading {
-    margin-bottom: 40px;
-  }
-  .journey-heading p {
-    font-size: 15px;
-  }
-  .journey-gallery {
-    gap: 30px;
-  }
-  .journey-image {
-    aspect-ratio: 1.25;
   }
   .landing-cta {
     padding: 100px 20px;

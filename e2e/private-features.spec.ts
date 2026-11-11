@@ -25,8 +25,12 @@ test('landing describes member features without loading a catalog or exposing fe
   const requests = await sessionApi(page);
   await page.goto('/');
   await expect(page.locator('.landing-page')).toBeVisible();
-  await expect(page.locator('#discover')).toContainText('signed-in AniTrack workspace');
-  await expect(page.locator('#assistant')).toContainText('Sign in to use the AI assistant');
+  await expect(page.locator('#features')).toContainText('Sample watchlist');
+  await expect(page.locator('#collections')).toContainText('Fantasy journeys');
+  await expect(page.locator('#discover')).toContainText('Sample catalog results');
+  await expect(page.locator('#assistant')).toContainText('Suggested match');
+  await page.getByText('See the clues it matched', { exact: true }).click();
+  await expect(page.getByText('A long-lived elf mage', { exact: true })).toBeVisible();
   await expect(page.locator('.poster-picker, .explore-search, textarea')).toHaveCount(0);
   const navigation = page.getByRole('navigation', { name: 'Main navigation', exact: true });
   await expect(navigation.getByRole('link', { name: 'Discover', exact: true })).toHaveAttribute('href', '/#discover');
@@ -137,6 +141,7 @@ for (const feature of ['discover', 'assistant']) {
     await expect(page.locator(feature === 'assistant' ? '.assistant-page' : '.explore-page')).toBeVisible();
     await expect(page.locator('.workspace-sidebar')).toBeVisible();
     await page.locator('button[aria-label="Log out"]:visible').click();
+    await page.getByRole('dialog', { name: 'Log out of AniTrack?' }).getByRole('button', { name: 'Log out', exact: true }).click();
     await expect(page).toHaveURL(url => url.pathname === '/');
     await page.goto(`/${feature}`);
     await expect(page).toHaveURL(url => url.pathname === '/login' && url.searchParams.get('redirect') === `/${feature}`);

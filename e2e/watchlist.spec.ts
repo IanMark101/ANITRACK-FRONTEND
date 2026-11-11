@@ -14,6 +14,7 @@ async function watchlistApi(page: Page) {
   };
   let reads = 0;
   let writes = 0;
+  let logoutRequests = 0;
   await page.route('**/api/**', async route => {
     const path = new URL(route.request().url()).pathname.replace('/api', '');
     const method = route.request().method();
@@ -27,6 +28,15 @@ async function watchlistApi(page: Page) {
       reads++;
       return ok({ items: writes ? [added, existing] : [existing], spotlightId: null, hasNext: false });
     }
+    if (path === '/watchlist/existing-entry/progress' && method === 'POST') {
+      existing.episodesWatched += route.request().postDataJSON().delta;
+      return ok({ item: existing });
+    }
+    if (path === '/auth/logout' && method === 'POST') {
+      logoutRequests++;
+      if (logoutRequests === 1) return route.fulfill({ status: 503, json: { error: { message: 'Temporarily unavailable.' } } });
+      return route.fulfill({ status: 204 });
+    }
     if (path === '/anime/meta') return ok({ genres: ['Adventure'], statuses: ['Watching', 'Plan to Watch', 'Completed'], posters: [] });
     if (path === '/discovery') return ok({ items: [{
       externalId: added.externalId, provider: 'KITSU', title: added.title, image: added.image,
@@ -38,8 +48,44 @@ async function watchlistApi(page: Page) {
     }
     return route.fulfill({ status: 404, json: { error: { message: 'Unexpected test request.' } } });
   });
-  return { counts: () => ({ reads, writes }) };
+  return { counts: () => ({ reads, writes }), logoutRequests: () => logoutRequests };
 }
+
+test('phone: episode tracking updates immediately and logout requires confirmation', async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const api = await watchlistApi(page);
+  await page.goto('/watchlist');
+  const tracker = page.getByRole('progressbar', { name: 'Fullmetal Alchemist: Brotherhood episode progress' });
+  const addEpisode = page.getByRole('button', { name: 'Mark one more episode watched for Fullmetal Alchemist: Brotherhood' });
+  await expect(tracker).toHaveAttribute('value', '1');
+  await addEpisode.click();
+  await expect(tracker).toHaveAttribute('value', '2');
+  const size = await addEpisode.boundingBox();
+  expect(size?.height).toBeGreaterThanOrEqual(44);
+  if (process.env.ANITRACK_WATCHLIST_QA_IMAGES) {
+    await page.screenshot({ path: testInfo.outputPath('watch-progress.png') });
+  }
+
+  const logout = page.getByRole('button', { name: 'Log out', exact: true });
+  await logout.click();
+  const dialog = page.getByRole('dialog', { name: 'Log out of AniTrack?' });
+  await expect(dialog.getByRole('button', { name: 'Stay signed in' })).toBeFocused();
+  if (process.env.ANITRACK_WATCHLIST_QA_IMAGES) {
+    await page.screenshot({ path: testInfo.outputPath('logout.png') });
+  }
+  await dialog.getByRole('button', { name: 'Stay signed in' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(logout).toBeFocused();
+  expect(api.logoutRequests()).toBe(0);
+  await logout.click();
+  const confirm = dialog.getByRole('button', { name: 'Log out', exact: true });
+  await confirm.click();
+  await expect(dialog.getByRole('alert')).toContainText('Could not sign out');
+  await expect(page).toHaveURL(/\/watchlist$/);
+  await confirm.click();
+  await expect(page).toHaveURL(url => url.pathname === '/');
+  expect(api.logoutRequests()).toBe(2);
+});
 
 for (const width of [1440, 768, 390]) {
   for (const source of ['catalog', 'custom']) {

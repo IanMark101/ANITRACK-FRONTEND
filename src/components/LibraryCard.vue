@@ -94,33 +94,27 @@ function fallback(event: Event) {
           ><button :disabled="store.busy" class="danger-text" @click="removeOpen = true"><PhTrash :size="17" />Remove from watchlist</button></QMenu>
       </button>
     </div>
-    <div class="library-card-meta">
-      <span>{{ entry.genre }}</span
-      ><button
-        :aria-label="`Rate ${entry.title}`"
-        @click="
-          rating = entry.rating;
-          ratingOpen = true;
-        "
-      >
-        <PhStar :size="14" weight="fill" />{{ entry.rating.toFixed(1) }}
-      </button>
+    <div class="library-card-content">
+      <h3><RouterLink :to="link">{{ entry.title }}</RouterLink></h3>
+      <div class="library-card-meta">
+        <span>{{ entry.genre }}</span>
+        <button :aria-label="`Rate ${entry.title}`" @click="rating = entry.rating; ratingOpen = true">
+          <PhStar :size="15" weight="fill" />{{ entry.rating.toFixed(1) }}
+        </button>
+      </div>
+      <WatchProgress v-if="progress" :entry="entry" compact />
+      <div class="library-card-bottom">
+        <select
+          :value="entry.status"
+          :aria-label="`Watch status for ${entry.title}`"
+          :disabled="store.busy"
+          @change="update({ status: ($event.target as HTMLSelectElement).value as WatchStatus })"
+        >
+          <option v-for="status in statuses" :key="status">{{ status }}</option>
+        </select>
+      </div>
+      <p v-if="error" class="inline-error" role="alert">{{ error }}</p>
     </div>
-    <h3>
-      <RouterLink :to="link">{{ entry.title }}</RouterLink>
-    </h3>
-    <div class="library-card-bottom">
-      <select
-        :value="entry.status"
-        :aria-label="`Watch status for ${entry.title}`"
-        :disabled="store.busy"
-        @change="update({ status: ($event.target as HTMLSelectElement).value as WatchStatus })"
-      >
-        <option v-for="status in statuses" :key="status">{{ status }}</option></select
-      >
-    </div>
-    <WatchProgress v-if="progress" :entry="entry" compact />
-    <p v-if="error" class="inline-error" role="alert">{{ error }}</p>
     <QDialog v-model="ratingOpen" :persistent="store.busy"
       ><section class="app-dialog small-dialog" aria-labelledby="rating-heading">
         <header>

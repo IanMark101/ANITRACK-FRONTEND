@@ -31,7 +31,7 @@
   .anitrack-layout .watch-progress form label,
   .anitrack-layout .watch-progress small { font-size: 12px; line-height: 1.65; }
   .anitrack-layout .watch-progress form input { min-height: 44px; font-size: 16px; }
-  .anitrack-layout .watch-progress-controls button { font-size: 12px; }
+  .anitrack-layout .watch-progress-controls button { font-size: 14px; }
   .anitrack-layout .watch-progress-controls { flex-wrap: wrap; }
   .anitrack-layout .section-heading p { font-size: 13px; }
   .anitrack-layout .overview-assistant p { font-size: 14px; }
@@ -189,26 +189,30 @@
   .anitrack-layout .account-form input { min-height: 48px; font-size: 16px; }
   .anitrack-layout :is(.state-panel, .session-recovery) h1 { font-size: 24px; line-height: 1.25; }
 
-  /* Cover grids stay two-up; controls wrap inside their own card, never the page. */
-  .anitrack-layout :is(.library-grid, .explore-grid, .collection-anime-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  /* Catalog and collection covers stay two-up. Watchlist rows keep progress beside the poster. */
+  .anitrack-layout :is(.explore-grid, .collection-anime-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  .anitrack-layout .watchlist-page .library-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .anitrack-layout .watchlist-page .library-card-content { padding: 0; }
+  .anitrack-layout .watchlist-page .library-card h3 { min-height: 0; }
   .anitrack-layout .library-card { min-width: 0; }
-  .anitrack-layout .library-card h3 { font-size: 15px; line-height: 1.4; min-height: 42px; }
-  .anitrack-layout .library-card-meta { min-height: 44px; font-size: 12px; gap: 6px; }
+  .anitrack-layout .library-card-content { padding: 10px; gap: 6px; }
+  .anitrack-layout .library-card h3 { font-size: 17px; line-height: 1.25; min-height: 2.5em; }
+  .anitrack-layout .library-card-meta { font-size: 12px; gap: 6px; }
   .anitrack-layout .library-card-meta button { min-height: 44px; font-size: 12px; }
   .anitrack-layout .cover-favorite { width: 44px; height: 44px; }
   .anitrack-layout .library-card-bottom { display: flex; gap: 8px; }
   .anitrack-layout .library-card-bottom select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; font-size: 13px; }
-  .anitrack-layout .watchlist-tabs { max-width: 100%; gap: 16px; padding-bottom: 4px; }
-  .anitrack-layout .watchlist-tabs button { min-height: 44px; font-size: 13px; }
+  .anitrack-layout .watchlist-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 8px; overflow: visible; padding: 0; }
+  .anitrack-layout .watchlist-tabs button { min-height: 44px; font-size: 13px; justify-content: space-between; }
   .anitrack-layout .watchlist-tabs button > span { font-size: 12px; }
   .anitrack-layout .watchlist-tools { gap: 12px; }
   .anitrack-layout .library-search { min-height: 48px; }
   .anitrack-layout .library-search input { font-size: 16px; }
   .anitrack-layout :is(.watchlist-tools > select, .favorites-filter) { min-height: 44px; font-size: 13px; }
-  .anitrack-layout .watch-progress-heading { flex-wrap: wrap; gap: 4px; font-size: 12px; }
-  .anitrack-layout .watch-progress-controls { display: flex; flex-wrap: wrap; gap: 8px; }
-  .anitrack-layout .watch-progress-controls button { min-height: 44px; min-width: 44px; padding: 8px; font-size: 12px; white-space: normal; }
-  .anitrack-layout .watch-progress-controls button:last-child { flex: 1; }
+  .anitrack-layout .watch-progress-heading { gap: 4px 8px; font-size: 13px; }
+  .anitrack-layout .watch-progress-controls { gap: 6px; }
+  .anitrack-layout .watch-progress-controls button { min-height: 44px; min-width: 44px; padding: 6px; font-size: 13px; }
+  .anitrack-layout .watch-progress-add { gap: 4px; }
   .anitrack-layout .watch-progress form { flex-wrap: wrap; gap: 12px; }
   .anitrack-layout .watch-progress form input { font-size: 16px; min-height: 44px; }
   .anitrack-layout .watch-progress small { font-size: 12px; line-height: 1.65; }

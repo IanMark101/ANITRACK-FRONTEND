@@ -73,4 +73,26 @@ describe('Watchlist loading', () => {
     expect(store.loadError).toContain('Temporary');
     expect(store.loading).toBe(false);
   });
+  it('keeps a confirmed import visible when an older watchlist response arrives', async () => {
+    let finishOldRead!: (value: unknown) => void;
+    let finishNewRead!: (value: unknown) => void;
+    const store = useWatchlistStore();
+    const saved = { id: 'added-title', title: 'Newly added anime' };
+    mocks.api
+      .mockReturnValueOnce(new Promise(resolve => { finishOldRead = resolve; }))
+      .mockResolvedValueOnce({ item: saved, created: true })
+      .mockReturnValueOnce(new Promise(resolve => { finishNewRead = resolve; }));
+
+    const pending = store.load();
+    await store.importAnime('123');
+    expect(store.items).toEqual([saved]);
+    finishOldRead({ items: [], spotlightId: null });
+    await vi.waitFor(() => expect(mocks.api).toHaveBeenCalledTimes(3));
+    expect(store.items).toEqual([saved]);
+    expect(store.spotlightId).toBe(saved.id);
+    finishNewRead({ items: [saved], spotlightId: saved.id });
+    await pending;
+    expect(store.items).toEqual([saved]);
+    expect(store.loaded).toBe(true);
+  });
 });

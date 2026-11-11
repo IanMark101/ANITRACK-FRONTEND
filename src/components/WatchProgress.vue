@@ -7,6 +7,7 @@ const props = defineProps<{ entry: Entry; compact?: boolean }>();
 const store = useWatchlistStore();
 const draft = ref(props.entry.episodesWatched || 0);
 const error = ref('');
+const pendingDelta = ref<1 | -1 | null>(null);
 watch(
   () => props.entry.episodesWatched,
   (value) => {
@@ -15,10 +16,13 @@ watch(
 );
 async function increment(delta: 1 | -1) {
   error.value = '';
+  pendingDelta.value = delta;
   try {
     await store.progress(props.entry.id, delta);
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Could not save progress.';
+  } finally {
+    pendingDelta.value = null;
   }
 }
 async function save() {
@@ -38,8 +42,8 @@ async function save() {
 <template>
   <div :class="['watch-progress', { compact }]">
     <div class="watch-progress-heading">
-      <span>Episode progress</span
-      ><strong>{{ entry.episodesWatched || 0 }} / {{ entry.totalEpisodes || '?' }}</strong>
+      <span>Episodes watched</span>
+      <strong aria-live="polite" aria-atomic="true">{{ entry.episodesWatched || 0 }}<template v-if="entry.totalEpisodes"> / {{ entry.totalEpisodes }}</template></strong>
     </div>
     <progress
       v-if="entry.totalEpisodes"
@@ -50,13 +54,7 @@ async function save() {
     <div class="watch-progress-controls">
       <button
         type="button"
-        :disabled="store.busy || !entry.episodesWatched"
-        :aria-label="`Undo one watched episode for ${entry.title}`"
-        @click="increment(-1)"
-      >
-        <PhMinus :size="16" /></button
-      ><button
-        type="button"
+        class="watch-progress-add"
         :aria-label="`Mark one more episode watched for ${entry.title}`"
         :disabled="
           store.busy ||
@@ -65,7 +63,16 @@ async function save() {
         "
         @click="increment(1)"
       >
-        <PhPlus :size="16" /> 1 episode
+        <PhPlus :size="17" aria-hidden="true" /> {{ pendingDelta === 1 ? 'Saving…' : '1 episode' }}
+      </button>
+      <button
+        type="button"
+        class="watch-progress-undo"
+        :disabled="store.busy || !entry.episodesWatched"
+        :aria-label="`Undo one watched episode for ${entry.title}`"
+        @click="increment(-1)"
+      >
+        <PhMinus :size="17" aria-hidden="true" />
       </button>
     </div>
     <form v-if="!compact" @submit.prevent="save">

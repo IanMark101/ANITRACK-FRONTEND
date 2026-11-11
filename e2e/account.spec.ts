@@ -52,6 +52,7 @@ test('registration, profile update, logout and password-recovery navigation', as
   await expect(page.getByRole('status')).toContainText('Your name has been updated');
   await expect(page.getByText('Email verified', { exact: true })).toBeVisible();
   await page.locator('button[aria-label="Log out"]:visible').click();
+  await page.getByRole('dialog', { name: 'Log out of AniTrack?' }).getByRole('button', { name: 'Log out', exact: true }).click();
   await page.goto('/login');
   await page.getByRole('link', { name: 'Forgot your password?' }).click();
   await expect(page.getByRole('heading', { name: 'Forgot your password?' })).toBeVisible();

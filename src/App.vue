@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { QLayout, QPageContainer, QMenu } from 'quasar';
+import { QDialog, QLayout, QPageContainer, QMenu } from 'quasar';
 import { useRouter, useRoute } from 'vue-router';
 import {
   PhArrowUpRight,
@@ -29,6 +29,8 @@ const router = useRouter();
 const route = useRoute();
 const authScreen = computed(() => ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/check-email'].includes(route.path));
 const assistant = useAssistantStore();
+const logoutOpen = ref(false);
+const loggingOut = ref(false);
 const logoutError = ref('');
 const reconnecting = ref(false);
 const publicMenuOpen = ref(false);
@@ -55,19 +57,27 @@ watch(
   (next, previous) => {
     if (next !== previous) watchlist.$reset();
     if (previous && next !== previous) assistant.$reset();
-    if (!next && previous && route.meta.protected)
+    if (!next && previous && route.meta.protected && !loggingOut.value)
       router.replace({ path: '/login', query: { redirect: route.fullPath } });
   },
   { flush: 'sync' }
 );
+function confirmLogout() {
+  logoutError.value = '';
+  logoutOpen.value = true;
+}
 async function logout() {
+  if (loggingOut.value) return;
+  loggingOut.value = true;
   logoutError.value = '';
   try {
     await auth.logout();
-    watchlist.$reset();
-    await router.push('/');
+    logoutOpen.value = false;
+    await router.replace('/');
   } catch {
     logoutError.value = 'Could not sign out. Check your connection and try again.';
+  } finally {
+    loggingOut.value = false;
   }
 }
 async function reconnect() {
@@ -107,7 +117,7 @@ async function reconnect() {
               :size="21"
               :weight="route.path === item.to ? 'fill' : 'regular'"
             /><span>{{ item.label }}</span
-            ><span v-if="item.to === '/watchlist' && watchlist.loaded" class="sidebar-count">{{
+            ><span v-if="item.to === '/watchlist' && (watchlist.loaded || watchlist.items.length)" class="sidebar-count">{{
               watchlist.items.length
             }}</span></RouterLink
           >
@@ -127,7 +137,7 @@ async function reconnect() {
               class="icon-button"
               aria-label="Log out"
               :disabled="auth.loading"
-              @click="logout"
+              @click="confirmLogout"
             >
               <PhSignOut :size="21" />
             </button>
@@ -146,7 +156,7 @@ async function reconnect() {
           class="icon-button workspace-mobile-logout"
           aria-label="Log out"
           :disabled="auth.loading"
-          @click="logout"
+          @click="confirmLogout"
         >
           <PhSignOut :size="21" />
         </button>
@@ -180,7 +190,7 @@ async function reconnect() {
             ><RouterLink to="/#assistant">Anime Assistant</RouterLink>
           </nav>
           <div v-if="!authScreen || auth.authenticated" class="header-actions" :class="{ 'verification-header-actions': auth.authenticated }">
-            <button v-if="auth.authenticated" class="verification-signout" :disabled="auth.loading" @click="logout">Log out</button>
+            <button v-if="auth.authenticated" class="verification-signout" :disabled="auth.loading" @click="confirmLogout">Log out</button>
             <template v-else><RouterLink to="/login" class="login-link">Log in</RouterLink
             ><RouterLink to="/register" class="btn btn-primary-action signup-link"
               >Sign up <PhArrowUpRight :size="17"
@@ -212,9 +222,6 @@ async function reconnect() {
           <p>{{ auth.sessionError }}</p>
           <button type="button" :disabled="reconnecting" @click="reconnect">{{ reconnecting ? 'Reconnecting…' : 'Try again' }}</button>
         </aside>
-        <p v-if="logoutError" class="app-feedback error-feedback" role="alert">
-          {{ logoutError }} <button @click="logout">Try again</button>
-        </p>
         <section
           v-if="route.meta.protected && auth.sessionError && !auth.authenticated"
           class="session-recovery"
@@ -237,5 +244,20 @@ async function reconnect() {
       <RouterLink v-if="!auth.authenticated" to="/#features">Explore AniTrack <PhArrowUpRight :size="16" /></RouterLink>
       <span>© {{ new Date().getFullYear() }} AniTrack</span>
     </footer>
+    <QDialog v-model="logoutOpen" :persistent="loggingOut" aria-labelledby="logout-heading" aria-describedby="logout-description">
+      <section class="app-dialog small-dialog logout-dialog" :aria-busy="loggingOut">
+        <h2 id="logout-heading">Log out of AniTrack?</h2>
+        <p id="logout-description">You’ll need to log in again to open your watchlist.</p>
+        <p v-if="logoutError" class="form-error" role="alert">{{ logoutError }}</p>
+        <footer>
+          <button type="button" class="btn btn-glass" data-autofocus :disabled="loggingOut" @click="logoutOpen = false">
+            Stay signed in
+          </button>
+          <button type="button" class="btn btn-primary-action" :disabled="loggingOut" @click="logout">
+            {{ loggingOut ? 'Logging out…' : 'Log out' }} <PhSignOut :size="18" />
+          </button>
+        </footer>
+      </section>
+    </QDialog>
   </QLayout>
 </template>

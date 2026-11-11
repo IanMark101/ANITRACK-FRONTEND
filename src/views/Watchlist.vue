@@ -91,9 +91,8 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
   <main class="workspace-page watchlist-page">
     <header class="page-heading">
       <div>
-        <p class="page-eyebrow">PERSONAL COLLECTION</p>
         <h1>
-          My watchlist<span v-if="store.loaded && store.items.length" class="heading-count">{{
+          My watchlist<span v-if="store.items.length" class="heading-count">{{
             store.items.length
           }}</span>
         </h1>
@@ -106,7 +105,7 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
     </header>
     <p v-if="notice" class="app-feedback success-feedback" role="status">{{ notice }}</p>
     <div
-      v-if="store.loading && !store.loaded"
+      v-if="store.loading && !store.loaded && !store.items.length"
       class="library-grid"
       role="status"
       aria-label="Loading your watchlist"
@@ -117,7 +116,7 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
         <div class="skeleton-line short" />
       </div>
     </div>
-    <section v-else-if="store.loadError && !store.loaded" class="page-error" role="alert">
+    <section v-else-if="store.loadError && !store.loaded && !store.items.length" class="page-error" role="alert">
       <PhBooks :size="38" />
       <h2>We couldn’t load your watchlist.</h2>
       <p>Your collection hasn’t changed. Let’s try connecting again.</p>
@@ -130,7 +129,6 @@ onBeforeUnmount(() => clearTimeout(noticeTimer));
         <img src="/images/editorial/kikis-delivery-service.webp" alt="Kiki with her cat Jiji" />
       </div>
       <div>
-        <span class="page-eyebrow">THE FIRST OF MANY</span>
         <h2>Your stories start here.</h2>
         <p>
           Save an anime you love or one you’ve been meaning to watch. We’ll help you keep track of

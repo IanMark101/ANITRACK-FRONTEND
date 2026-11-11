@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
     </header>
     <p v-if="notice" class="app-feedback success-feedback" role="status">{{ notice }}</p>
     <div
-      v-if="store.loading && !store.loaded"
+      v-if="store.loading && !store.loaded && !store.items.length"
       class="overview-loading"
       role="status"
       aria-label="Loading your overview"
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
       <div class="skeleton-line" />
       <AnimeShelf title="Your watchlist" loading />
     </div>
-    <section v-else-if="store.loadError && !store.loaded" class="page-error" role="alert">
+    <section v-else-if="store.loadError && !store.loaded && !store.items.length" class="page-error" role="alert">
       <PhBooks :size="35" />
       <h2>Your library is taking a moment.</h2>
       <p>We couldn’t load your watchlist. Your saved titles are still yours.</p>

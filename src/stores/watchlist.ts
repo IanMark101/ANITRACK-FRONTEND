@@ -5,6 +5,7 @@ import type { Anime, Collection, Entry, Metadata } from '../types';
 export const useWatchlistStore = defineStore('watchlist', {
   state: () => ({
     requestScope: {},
+    writeVersion: 0,
     items: [] as Entry[],
     spotlightId: null as string | null,
     catalog: [] as Anime[],
@@ -18,12 +19,12 @@ export const useWatchlistStore = defineStore('watchlist', {
   }),
   actions: {
     async importAnime(externalId: string) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         const result = await api<{ item: Entry; created: boolean }>('/watchlist/import', {
           method: 'POST',
           body: jsonBody({ externalId })
         });
-        if (!current()) return;
+        if (!acceptResult()) return;
         const index = this.items.findIndex((entry) => entry.id === result.item.id);
         if (index === -1) this.items.unshift(result.item);
         else this.items[index] = result.item;
@@ -32,12 +33,12 @@ export const useWatchlistStore = defineStore('watchlist', {
       });
     },
     async progress(id: string, delta: 1 | -1) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         const { item } = await api<{ item: Entry }>(`/watchlist/${id}/progress`, {
           method: 'POST',
           body: jsonBody({ delta })
         });
-        if (!current()) return;
+        if (!acceptResult()) return;
         const index = this.items.findIndex((entry) => entry.id === id);
         if (index !== -1) this.items[index] = item;
         return item;
@@ -50,20 +51,26 @@ export const useWatchlistStore = defineStore('watchlist', {
       this.loadError = '';
       this.loadPromise = (async () => {
         try {
-          const collection = await api<Collection>('/watchlist');
-          if (scope !== this.requestScope) return;
-          let page = 1;
-          let next = collection.hasNext;
-          while (next && page < 250) {
-            const extra = await api<Collection>(`/watchlist?page=${++page}`);
+          while (scope === this.requestScope) {
+            const version = this.writeVersion;
+            const collection = await api<Collection>('/watchlist');
             if (scope !== this.requestScope) return;
-            collection.items.push(...extra.items);
-            next = extra.hasNext;
+            let page = 1;
+            let next = collection.hasNext;
+            while (next && page < 250 && version === this.writeVersion) {
+              const extra = await api<Collection>(`/watchlist?page=${++page}`);
+              if (scope !== this.requestScope) return;
+              collection.items.push(...extra.items);
+              next = extra.hasNext;
+            }
+            // A read started before a confirmed write can return an older list.
+            if (version !== this.writeVersion) continue;
+            if (next) throw new Error('Your collection is too large to load. Please contact support.');
+            this.items = collection.items;
+            this.spotlightId = collection.spotlightId;
+            this.loaded = true;
+            return;
           }
-          if (next) throw new Error('Your collection is too large to load. Please contact support.');
-          this.items = collection.items;
-          this.spotlightId = collection.spotlightId;
-          this.loaded = true;
         } catch (error) {
           if (scope !== this.requestScope) return;
           this.loadError = error instanceof Error ? error.message : 'Unable to load collection.';
@@ -83,14 +90,18 @@ export const useWatchlistStore = defineStore('watchlist', {
       if (scope !== this.requestScope) return;
       this.metadata = metadata;
     },
-    async mutate<T>(operation: (current: () => boolean) => Promise<T>): Promise<T | undefined> {
+    async mutate<T>(operation: (acceptResult: () => boolean) => Promise<T>): Promise<T | undefined> {
       if (this.busy) return;
       const scope = this.requestScope;
       const current = () => scope === this.requestScope;
       this.busy = true;
       this.actionError = '';
       try {
-        return await operation(current);
+        return await operation(() => {
+          if (!current()) return false;
+          this.writeVersion++;
+          return true;
+        });
       } catch (error) {
         if (!current()) return;
         this.actionError = error instanceof Error ? error.message : 'Could not save your change.';
@@ -100,50 +111,50 @@ export const useWatchlistStore = defineStore('watchlist', {
       }
     },
     async add(input: unknown) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         const { item } = await api<{ item: Entry }>('/watchlist', {
           method: 'POST',
           body: jsonBody(input)
         });
-        if (!current()) return;
+        if (!acceptResult()) return;
         this.items.unshift(item);
         this.spotlightId = item.id;
         return item;
       });
     },
     async update(id: string, changes: Partial<Entry>) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         const { item } = await api<{ item: Entry }>(`/watchlist/${id}`, {
           method: 'PATCH',
           body: jsonBody(changes)
         });
-        if (!current()) return;
+        if (!acceptResult()) return;
         const index = this.items.findIndex((entry) => entry.id === id);
         if (index !== -1) this.items[index] = item;
         return item;
       });
     },
     async remove(id: string) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         await api(`/watchlist/${id}`, { method: 'DELETE' });
-        if (!current()) return;
+        if (!acceptResult()) return;
         this.items = this.items.filter((entry) => entry.id !== id);
         if (this.spotlightId === id) this.spotlightId = null;
         return true;
       });
     },
     async spotlight(id: string) {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         await api('/watchlist/spotlight', { method: 'PUT', body: jsonBody({ entryId: id }) });
-        if (!current()) return;
+        if (!acceptResult()) return;
         this.spotlightId = id;
         return true;
       });
     },
     async reset() {
-      return this.mutate(async (current) => {
+      return this.mutate(async (acceptResult) => {
         const collection = await api<Collection>('/watchlist/reset', { method: 'POST' });
-        if (!current()) return;
+        if (!acceptResult()) return;
         this.items = collection.items;
         this.spotlightId = collection.spotlightId;
         if (collection.hasNext) await this.load();
