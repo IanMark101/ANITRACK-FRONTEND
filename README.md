@@ -1,5 +1,7 @@
 # AniTrack Frontend
 
+The [academic technical report](docs/assessment/AniTrack-Technical-Documentation.pdf) documents the web and Android application in 32 pages, including architecture, data models, feature guides, testing, references, and submission requirements. The [instructor procedure audit](docs/assessment/INSTRUCTOR-COMPLIANCE.md) records all eight Capacitor steps, the debug-build and wireless-ADB adaptations, and the remaining setup screenshot and personal inbox checks. See [individual Classroom submission details](docs/CLASSROOM-SUBMISSION.md) for Group 2 information.
+
 The landing page explains AniTrack and links to registration/login. Discover, Anime Assistant, anime details, and all personal workspace pages require authentication and verified email. Guest links explain the features on the landing page; direct feature URLs lead to login and preserve the intended destination. Unverified accounts, including older accounts, go to /check-email without loading workspace pages or navigation. Catalog, discovery, AI and personal APIs independently enforce the same requirement.
 
 `/collections` organizes saved anime into private themed groups, with the reference-inspired charcoal cards and overlapping cover art. Create, rename, describe or delete groups; add saved titles, remove them from a group and change their order. One anime can belong to several collections. Removing a group preserves watchlist progress. Limits are 20 groups and 100 titles per group. [Design and responsive review](docs/COLLECTIONS-DESIGN.md).

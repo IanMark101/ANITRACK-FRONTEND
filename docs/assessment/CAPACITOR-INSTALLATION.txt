@@ -1,0 +1,41 @@
+AniTrack - recorded Capacitor setup
+Recorded 6 November 2026
+
+Installed packages (read from the installed lockfile; folders verified):
+@capacitor/core: 8.5.3
+@capacitor/android: 8.5.3
+@capacitor/app: 8.1.2
+@capacitor/cli: 8.6.0
+
+Project directory:
+C:/Users/Lenovo/Desktop/ANITRACK/ANITRACK-FRONTEND/src-capacitor
+
+src-capacitor/
+  capacitor.config.ts
+  package.json
+  package-lock.json
+  node_modules/@capacitor/
+    android/
+    app/
+    cli/
+    core/
+  www/
+  android/
+    app/
+    app/src/main/AndroidManifest.xml
+    app/src/main/java/org/anitrack/app/MainActivity.java
+    app/build/outputs/apk/debug/app-debug.apk
+    gradle/wrapper/gradle-wrapper.properties
+    gradlew.bat
+    build.gradle
+    settings.gradle
+
+Gradle: BUILD SUCCESSFUL
+Java runtime: JDK 21
+Android compile/target SDK: 36
+Minimum SDK: 24
+App ID: org.anitrack.app
+
+Final APK SHA-256: c698faa3effbb2f9915123f65d7d1f4d0906774121e70f074731b10aafe6bb4f
+
+This is a generated environment verification record, not an image of a terminal.

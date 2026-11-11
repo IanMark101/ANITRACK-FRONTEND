@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-06",
+  "applicationId": "org.anitrack.app",
+  "environment": {
+    "date": "2026-11-06",
+    "project": "AniTrack",
+    "node": "v26.13.0",
+    "npm": "12.2.1",
+    "quasar": "@quasar/app-vite 3.10.3",
+    "java": "openjdk version \"21.0.13.0.2\" 2026-10-22 LTS\r\nOpenJDK Runtime Environment Microsoft-15780113 (build 21.0.13.0.2+1-LTS)\r\nOpenJDK 64-Bit Server VM Microsoft-15780113 (build 21.0.13.0.2+1-LTS, mixed mode, sharing)",
+    "androidStudioVersion": "262.10968.63.0-AI",
+    "androidPlatform36": true,
+    "androidBuildTools36": true,
+    "adb": "Android Debug Bridge version 1.0.41\r\nVersion 37.0.1-15733141\r\nInstalled as C:\\Users\\Lenovo\\AppData\\Local\\Android\\Sdk\\platform-tools\\adb.exe\r\nRunning on Windows 10.0.19045",
+    "frontendFiles": {
+      "quasarConfiguration": true,
+      "androidProject": true,
+      "package": true,
+      "capacitor": true
+    },
+    "websiteStatus": 200,
+    "apiHealth": "ok",
+    "capacitorPackages": {
+      "@capacitor/android": {
+        "version": "8.5.3",
+        "resolved": "https://registry.npmjs.org/@capacitor/android/-/android-8.5.3.tgz",
+        "overridden": false
+      },
+      "@capacitor/cli": {
+        "version": "8.6.0",
+        "resolved": "https://registry.npmjs.org/@capacitor/cli/-/cli-8.6.0.tgz",
+        "overridden": false
+      },
+      "@capacitor/core": {
+        "version": "8.5.3",
+        "resolved": "https://registry.npmjs.org/@capacitor/core/-/core-8.5.3.tgz",
+        "overridden": false
+      }
+    }
+  },
+  "device": {
+    "model": "Infinix X6833B",
+    "android": "14"
+  },
+  "apk": {
+    "buildSha256": "c698faa3effbb2f9915123f65d7d1f4d0906774121e70f074731b10aafe6bb4f",
+    "installedSha256": "c698faa3effbb2f9915123f65d7d1f4d0906774121e70f074731b10aafe6bb4f",
+    "submissionSha256": "c698faa3effbb2f9915123f65d7d1f4d0906774121e70f074731b10aafe6bb4f"
+  },
+  "nativeSmokeCheck": {
+    "date": "2026-11-06",
+    "startup": "verified hot launch",
+    "nativeApi": {
+      "status": 200,
+      "health": "ok",
+      "transport": "Capacitor native HTTP"
+    },
+    "loginForm": "opened",
+    "recoveryForm": "opened",
+    "navigationMenu": "opened and dismissed by selecting the information section",
+    "informationalDestination": "https://localhost/#/#discover",
+    "viewport": {
+      "width": 360,
+      "scrollWidth": 360
+    },
+    "accountDataChanged": false
+  },
+  "gradleRecheck": "BUILD SUCCESSFUL in 38s; 123 tasks up-to-date",
+  "proceduralAdaptations": [
+    "Debug asset preparation and direct Gradle assembly instead of replaying the IDE-opening command",
+    "Paired wireless ADB instead of USB device selection"
+  ],
+  "setupScreenshotProvided": false,
+  "realInboxReceiptConfirmed": false
+}

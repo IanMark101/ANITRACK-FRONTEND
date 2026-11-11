@@ -16,7 +16,7 @@ The website and bundled Android debug application are implemented, built and tes
 | Branding | Canonical website torii SVG drives Android icons and splash. |
 | Dependencies | Frontend, native and backend audits each reported zero known vulnerabilities at this check. |
 | Local network | Normal API port 3001 and website port 5173 work over Wi-Fi. ACCOUNT_LINK_ORIGIN selects the phone-reachable email page and trusts only that exact additional origin. HTTPS required in production. |
-| Submission | Group 2, BSIT 4-B; leader Ian Mark Buenaflor. PDF, original web/phone screenshots, optional local APK, hashes and instructions in ../SUBMISSION. |
+| Submission | Group 2, BSIT 4-B; leader Ian Mark Buenaflor. The 32-page academic report covers eight chapters, diagrams, feature guides, test evidence, references and two appendices. Original web/phone screenshots, the local APK, hashes and instructions are in ../SUBMISSION. The [report](assessment/AniTrack-Technical-Documentation.pdf) and [eight-step audit](assessment/INSTRUCTOR-COMPLIANCE.md) are also available in this repository. |
 | Cleanup | Disposable schemas, captured mail and review accounts removed; only required evidence, source tests, build tools and intentional outputs retained. |
 
 ## Remaining before turn-in

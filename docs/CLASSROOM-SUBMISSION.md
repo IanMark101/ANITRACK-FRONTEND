@@ -12,6 +12,10 @@ Complete Names of All Group Members:
 3. Rochelle Andales
 4. Kent Jeced Alcantara
 
+## Technical documentation
+
+AniTrack-Submission.pdf is the 32-page academic technical report. It includes an abstract, linked contents, eight chapters, architecture and data diagrams, feature guides, genuine web and phone figures, testing records, references, and two appendices. Appendix A maps the instructor's eight-step Capacitor procedure and the required submission evidence. AniTrack-Academic-Documentation.md is the editable source; its images remain in the accompanying folders.
+
 ## Web Application - Final Examination (50 points)
 
 Local website: http://localhost:5173. Keep both the frontend and backend running. Online deployment is not required by the assignment.
@@ -24,7 +28,7 @@ AniTrack is a bundled Capacitor app, installed and tested on an Infinix Note 30 
 
 Screenshots in `android/`: dashboard-running.png (installed/running app), watchlist.png and collections.png (working features), trailer.png (player dialog), and login.png (responsive account flow).
 
-`setup/` contains recorded Capacitor installation and Android project evidence. `apk/` contains the optional final APK and its SHA-256 manifest. This local debug APK needs the laptop backend running on the same Wi-Fi; it is not an Internet-hosted service.
+`setup/` contains the recorded Capacitor installation, the eight-step compliance audit, and actual Gradle console output. The required genuine setup screenshot is still pending; follow setup/CAPTURE-INSTRUCTIONS.md and save it as setup/capacitor-and-android-project.png. `apk/` contains the optional final APK and its SHA-256 manifest. This local debug APK needs the laptop backend running on the same Wi-Fi; it is not an Internet-hosted service.
 
 Feature screenshots use a disposable account and isolated database. The test data is removed after evidence capture. The screenshots are retained, and no real user credentials are included.
 
