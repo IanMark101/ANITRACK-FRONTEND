@@ -87,6 +87,7 @@ async function submit() {
   const ticket = ++request;
   loading.value = true;
   error.value = notice.value = actionError.value = '';
+  const timeout = AbortSignal.timeout(30000);
   try {
     const result = await api<AssistantResult>('/assistant', {
       method: 'POST',
@@ -98,7 +99,7 @@ async function submit() {
           ? [...savedIds.value].filter((id): id is string => Boolean(id)).slice(0, 300)
           : []
       }),
-      signal: AbortSignal.any([signal, AbortSignal.timeout(65000)])
+      signal: AbortSignal.any([signal, timeout])
     });
     if (ticket !== request) return;
     search.result = result;
@@ -114,9 +115,11 @@ async function submit() {
   } catch (cause) {
     if (ticket === request && !signal.aborted)
       error.value =
-        cause instanceof Error
-          ? cause.message
-          : 'We could not find matches just now. Please try again.';
+        timeout.aborted
+          ? 'The anime assistant took too long. Please try again.'
+          : cause instanceof Error
+            ? cause.message
+            : 'We could not find matches just now. Please try again.';
   } finally {
     if (ticket === request) loading.value = false;
   }
@@ -303,8 +306,7 @@ onBeforeUnmount(cancel);
       </aside>
     </div>
     <p v-if="loading" class="assistant-loading" role="status">
-      Reading your {{ identifying ? 'clues' : 'preferences' }} and checking the anime catalog. This
-      can take up to a minute.
+      Reading your {{ identifying ? 'clues' : 'preferences' }} and checking the anime catalog.
     </p>
     <section
       v-if="current.result"

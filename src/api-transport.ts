@@ -52,7 +52,7 @@ export async function request(path: string, options: RequestInit): Promise<Respo
     headers: Object.fromEntries(new Headers(options.headers).entries()),
     ...(options.body ? { data: JSON.parse(String(options.body)) } : {}),
     connectTimeout: restoring ? 8000 : 20000,
-    readTimeout: restoring ? 8000 : path === '/assistant' ? 65000 : 35000,
+    readTimeout: restoring ? 8000 : path === '/assistant' ? 30000 : 35000,
     responseType: 'text',
     disableRedirects: true
   }), options.signal);
