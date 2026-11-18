@@ -1201,7 +1201,7 @@
   color: #828da4;
   font-size: 11px;
 }
-.app-dialog input:not([type='range']):not([type='file']),
+.app-dialog input:not([type='range']):not([type='file']):not([type='checkbox']):not([type='search']),
 .app-dialog select,
 .app-dialog textarea {
   background: #141923;
@@ -1849,7 +1849,7 @@
   .dialog-search > svg {
     display: none;
   }
-  .app-dialog input:not([type='range']):not([type='file']),
+  .app-dialog input:not([type='range']):not([type='file']):not([type='checkbox']):not([type='search']),
   .app-dialog select,
   .app-dialog textarea {
     font-size: 16px;

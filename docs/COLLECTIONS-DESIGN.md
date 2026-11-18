@@ -25,3 +25,7 @@ The app critique:
 7. Phone navigation folds secondary destinations into More. Touch controls are at least 44px, the list becomes one column and detail uses two poster columns. The More menu and deletion confirmation passed browser checks.
 
 Reviewed warnings: `panel-void` flags the intentional space between centered card titles and fanned covers from the user's reference. `micro-label` flags the existing sidebar scope label, retained with the established shell. `mixed-font-headline` flags the branded wordmark/torii combination; actual page titles use one face. Source `glass`/`shadow` warnings match explicit `backdrop-filter: none` and `box-shadow: none` overrides, not visual effects. These are documented allowances, not unresolved failures.
+
+## Watchlist picker regression, 18 November 2026
+
+Shared dialog field styles had applied a full-width text field to each result checkbox and an inner border to the search input. The picker now places the checkbox, poster, and title in separate grid columns and puts the focus outline on the search control. Playwright checks result visibility, the search border and focus outline, horizontal overflow, selection, and adding a matching title. Production build captures were inspected at 1440, 768, 390, and 320 pixels. At 320 pixels the heading and footer wrap so the action and selected count stay readable.
