@@ -40,6 +40,20 @@ textarea:focus-visible {
   outline: 2px solid #f8a7ad;
   outline-offset: 4px;
 }
+/* Unified search inputs & bars: prevent thick pale red or highlighted outlines when clicked or focused */
+:is(.explore-search, .library-search, .collection-search, .dialog-search) input,
+:is(.explore-search, .library-search, .collection-search, .dialog-search) input:focus,
+:is(.explore-search, .library-search, .collection-search, .dialog-search) input:focus-visible,
+input[type='search'],
+input[type='search']:focus,
+input[type='search']:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+:is(.explore-search, .library-search, .collection-search, .dialog-search):focus-within {
+  outline: none !important;
+}
 .wordmark {
   font-family: Outfit, sans-serif;
   font-size: 25px;
@@ -516,8 +530,12 @@ textarea:focus-visible {
 .dashboard-content .card-poster {
   cursor: pointer;
 }
+::placeholder,
+input::placeholder,
+textarea::placeholder,
 .form-input::placeholder {
-  color: #9999a6;
+  color: #9199af;
+  opacity: 1;
 }
 .form-label {
   color: #c2c2cd;

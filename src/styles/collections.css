@@ -17,7 +17,7 @@
 .collection-search { display: flex; gap: 10px; align-items: center; min-height: 44px; border: 1px solid #3b3b3b; border-radius: 6px; padding: 0 12px; color: #bfbfbf; width: min(100%, 340px); background: #1a1a1a; }
 .collection-search > svg { flex: none; }
 .collection-search input { border: 0; padding: 10px 0; background: transparent; color: #f4f4f4; flex: 1; width: 100%; min-width: 0; font: inherit; font-size: 13px; }
-.collection-search:focus-within { outline: 2px solid #ddd; outline-offset: 2px; }
+.collection-search:focus-within { outline: none; }
 .collection-meta, .collection-detail-meta { display: flex; align-items: center; gap: 6px; color: #bcbcbc; font-size: 12px; }
 .collection-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .collection-card { position: relative; display: block; min-height: 260px; background: #1e1e1e; border: 1px solid transparent; border-radius: 8px; overflow: hidden; text-decoration: none; color: #f4f4f4; transition: border-color .16s ease, background .16s ease; }
@@ -72,7 +72,16 @@
 .collection-picker footer > span, .collection-picker-list > p { font-size: 13px; color: #c4c4c4; line-height: 1.6; }
 .collections-page :is(a,button,input,textarea):focus-visible, .collection-dialog :is(a,button,input,textarea):focus-visible { outline: 2px solid #eee; outline-offset: 3px; }
 /* Keep one visible focus ring on the search control, including its icon. */
-.collections-page .collection-search input:focus-visible, .collection-dialog .collection-search input:focus-visible { outline: none; }
+.collections-page .collection-search input,
+.collections-page .collection-search input:focus,
+.collections-page .collection-search input:focus-visible,
+.collection-dialog .collection-search input,
+.collection-dialog .collection-search input:focus,
+.collection-dialog .collection-search input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
 .mobile-more-button { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 11px; min-height: 54px; cursor: pointer; }
 .mobile-more-menu { background: #242424; border: 1px solid #444; color: #eee; border-radius: 8px; min-width: 210px; }
 .mobile-more-menu a { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 12px 18px; color: inherit; text-decoration: none; font-size: 14px; }

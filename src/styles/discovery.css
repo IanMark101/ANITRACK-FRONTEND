@@ -61,6 +61,16 @@
   color: #f5f5f8;
   padding: 12px 0;
   font-size: 14px;
+  outline: none;
+}
+.explore-search input:focus,
+.explore-search input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+.explore-search:focus-within {
+  outline: none !important;
 }
 .explore-toolbar {
   display: flex;

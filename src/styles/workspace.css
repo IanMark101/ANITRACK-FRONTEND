@@ -885,6 +885,15 @@
   color: #eff0f8;
   font-size: 12px;
 }
+.library-search input:focus,
+.library-search input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+.library-search:focus-within {
+  outline: none !important;
+}
 .watchlist-tools > select {
   background: #191d26;
   color: #b9c0d2;
@@ -1242,6 +1251,15 @@
   background: transparent !important;
   padding: 7px 0 !important;
   outline: none;
+}
+.app-dialog .dialog-search input:focus,
+.app-dialog .dialog-search input:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+.app-dialog .dialog-search:focus-within {
+  outline: none !important;
 }
 .dialog-search .btn {
   flex: none;
