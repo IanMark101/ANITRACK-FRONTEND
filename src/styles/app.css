@@ -33,14 +33,23 @@ button:disabled {
   cursor: not-allowed;
 }
 button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+a:focus-visible {
   outline: 2px solid #f8a7ad;
   outline-offset: 4px;
 }
-/* Unified search inputs & bars: prevent thick pale red or highlighted outlines when clicked or focused */
+/* Unified input, search bar & textarea focus styling: eliminate all thick pale-red outlines across the entire site */
+input,
+textarea,
+select {
+  outline: none;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
 :is(.explore-search, .library-search, .collection-search, .dialog-search) input,
 :is(.explore-search, .library-search, .collection-search, .dialog-search) input:focus,
 :is(.explore-search, .library-search, .collection-search, .dialog-search) input:focus-visible,

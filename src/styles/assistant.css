@@ -112,9 +112,18 @@
   background: #111116;
   font-size: 14px;
   line-height: 1.8;
+  outline: none;
+}
+.assistant-composer textarea:focus,
+.assistant-composer textarea:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border-color: #6b6b7a;
 }
 .assistant-composer textarea::placeholder {
-  color: #898997;
+  color: #9199af;
+  opacity: 1;
 }
 .assistant-composer textarea[aria-invalid='true'] {
   border-color: #f08d96;

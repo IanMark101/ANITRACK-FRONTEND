@@ -1949,8 +1949,9 @@
 .account-panel p { margin: 12px 0 20px; line-height: 1.6; color: #c5c5cf; }
 .account-form { display: grid; gap: 18px; max-width: 520px; margin: 20px 0; }
 .account-form label { display: grid; gap: 8px; font-weight: 600; }
-.account-form input { padding: 12px 14px; width: 100%; min-width: 0; border: 1px solid #4b4b58; border-radius: 10px; background: #101014; color: #fff; font: inherit; }
-.account-form input:focus-visible { outline: 2px solid #f35b63; outline-offset: 3px; }
+.account-form input { padding: 12px 14px; width: 100%; min-width: 0; border: 1px solid #4b4b58; border-radius: 10px; background: #101014; color: #fff; font: inherit; outline: none; }
+.account-form input:focus,
+.account-form input:focus-visible { outline: none !important; outline-offset: 0 !important; box-shadow: none !important; border-color: #5d5d6c; }
 .account-link-page { max-width: 600px; padding-top: 40px; padding-bottom: 40px; }
 .account-link-page h1 { font-size: 32px; }
 .account-link-page .account-panel { margin-bottom: 0; }

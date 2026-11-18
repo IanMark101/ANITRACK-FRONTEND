@@ -70,7 +70,13 @@
 .collection-picker-row img { width: 40px; height: 56px; border-radius: 3px; object-fit: cover; }
 .collection-picker-row span { line-height: 1.5; overflow-wrap: anywhere; }
 .collection-picker footer > span, .collection-picker-list > p { font-size: 13px; color: #c4c4c4; line-height: 1.6; }
-.collections-page :is(a,button,input,textarea):focus-visible, .collection-dialog :is(a,button,input,textarea):focus-visible { outline: 2px solid #eee; outline-offset: 3px; }
+.collections-page :is(a,button):focus-visible, .collection-dialog :is(a,button):focus-visible { outline: 2px solid #eee; outline-offset: 3px; }
+.collections-page :is(input,textarea):focus, .collections-page :is(input,textarea):focus-visible,
+.collection-dialog :is(input,textarea):focus, .collection-dialog :is(input,textarea):focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
 /* Keep one visible focus ring on the search control, including its icon. */
 .collections-page .collection-search input,
 .collections-page .collection-search input:focus,
